@@ -5,7 +5,7 @@
 module.exports = {
   // MongoDB connection options
   mongo: {
-    uri: 'mongodb://localhost/mean-stack-dev'
+    uri: 'mongodb://localhost/garagepi-dev'
   },
 
   seedDB: true

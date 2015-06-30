@@ -1,6 +1,6 @@
 {
-  "name": "mean-stack-test",
-  "version": "0.0.0",
+  "name": "GaragePi",
+  "version": "0.0.1",
   "main": "server/app.js",
   "dependencies": {
     "body-parser": "^1.12.3",
@@ -78,5 +78,5 @@
   "engines": {
     "node": ">=0.10.0"
   },
-  "private": true
+  "private": false
 }

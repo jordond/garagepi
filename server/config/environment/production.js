@@ -14,7 +14,7 @@ module.exports = {
   // MongoDB connection options
   mongo: {
     uri:    process.env.MONGO_URL ||
-            'mongodb://localhost/mean-stack'
+            'mongodb://localhost/garagepi'
   },
 
   token: {
