@@ -67,16 +67,27 @@
      * @return {Promise} For keeping track of notify
      */
     function syncUpdates(modelName, array) {
-      var model = {
-        name: modelName,
-        array: array,
-        deferred: $q.defer()
-      };
+      var model
+        , existing;
+
+      existing = _.findIndex(registeredModels, function (item) {
+        return item.name === modelName;
+      });
+
+      if (existing !== -1) {
+        return $q.reject();
+      }
 
       if (angular.isUndefined(self.wrapper)) {
         logger.swalError(TAG, 'Something went wrong with socket connection, live updating will not work.');
         return $q.reject();
       }
+
+      model = {
+        name: modelName,
+        array: array,
+        deferred: $q.defer()
+      };
 
       ready.then(function () {
         registeredModels.push(model);
@@ -85,7 +96,6 @@
             return model.deferred.notify(response);
           });
       });
-
       return model.deferred.promise;
     }
 
