@@ -122,29 +122,19 @@
      * @return {promise}      Status of emit
      */
     function emit(event, data) {
-      var deferred = $q.defer();
       if (isConnected) {
-        ready.then(function () {
-          self.wrapper.emit(event, data, function (response) {
-            deferred.resolve(response);
-          });
+        return ready.then(function () {
+          self.wrapper.emit(event, data);
         });
-        return deferred.promise;
       }
-      return deferred.reject();
     }
 
     function registerEvent(event) {
-      var deferred = $q.defer();
       if (ready) {
-        ready.then(function () {
-          self.wrapper.on(event, function (data) {
-            deferred.resolve(data);
-          });
+        return ready.then(function () {
+          self.wrapper.on(event);
         });
-        return deferred.promise;
       }
-      return deferred.reject();
     }
 
     /**
