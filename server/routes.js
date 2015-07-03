@@ -6,15 +6,19 @@
 
 var errors = require('./components/errors');
 var auth = require('./auth/auth.service');
-
 var debug = require('./components/errors/error.controller');
+var log = require('./components/logger/console');
 
-module.exports = function(app) {
-
+module.exports = function(app, secureApi) {
   // Lock down api
-  app.use('/api', auth.isAuthenticated());
+  if (secureApi) {
+    app.use('/api', auth.isAuthenticated());
+  } else {
+    displayInsecureWarning();
+  }
 
   // Insert routes below
+  app.use('/api/gpios', require('./api/gpio'));
   app.use('/api/settings', require('./api/setting'));
   app.use('/api/things', require('./api/thing'));
   app.use('/api/users', require('./api/user'));
@@ -34,3 +38,14 @@ module.exports = function(app) {
       res.sendfile(app.get('appPath') + '/index.html');
     });
 };
+
+function displayInsecureWarning() {
+  log.warn('Routes', '=======================================')
+  log.warn('Routes', '=  RUNNING WITH API IN INSECURE MODE  =');
+  if (process.env.NODE_ENV === 'production') {
+  log.warn('Routes', '= NO AUTHENTICATION REQUIRED FOR API  =');
+  log.warn('Routes', '= SET secureApi IN env.js!            =');
+  }
+  log.warn('Routes', '=Ignore this warning if it is intended=')
+  log.warn('Routes', '=======================================');
+}

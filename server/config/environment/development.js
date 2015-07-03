@@ -8,5 +8,8 @@ module.exports = {
     uri: 'mongodb://localhost/garagepi-dev'
   },
 
+  // API WILL NOT REQUIRE AUTHENTICATION
+  secureApi: false,
+
   seedDB: true
 };

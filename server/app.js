@@ -20,9 +20,12 @@ mongoose.connection.on('connected', function () {
     serveClient: (config.env === 'production') ? false : true,
     path: '/socket.io-client'
   });
+
+  app.set('config', config);
+
   require('./config/socketio')(socketio);
   require('./config/express')(app);
-  require('./routes')(app);
+  require('./routes')(app, config.secureApi);
 
   if(config.seedDB) {
     require('./settings/seeder').seeder();

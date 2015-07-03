@@ -14,10 +14,10 @@ var validationError = function (res, err) {
  * Get list of users
  * restriction: 'admin'
  */
-exports.index = function (req, res) {
+exports.index = function (req, res, next) {
   var userList = [];
   User.find({}, '-salt -hashedPassword', function (err, users) {
-    if(err) return res.status(500).json(err);
+    if(err) return next(err);
     for (var i = 0; i < users.length; i++) {
       userList.push(users[i].profile);
     }
@@ -57,9 +57,9 @@ exports.show = function (req, res, next) {
  * Deletes a user
  * restriction: 'admin'
  */
-exports.destroy = function (req, res) {
+exports.destroy = function (req, res, next) {
   User.findById(req.params.id, function (err, user) {
-    if (err) { return res.status(500).json(err); }
+    if (err) { return next(err); }
     if (!user) { return res.sendStatus(404); }
     user.remove(function (err) {
       if (err) { return res.status(500).json(err); }
@@ -93,7 +93,10 @@ exports.changePassword = function (req, res, next) {
  * Get my info
  */
 exports.me = function (req, res, next) {
-  var userId = req.user._id;
+  var userId;
+  if (typeof req.user !== 'undefined') {
+    userId = req.user._id;
+  }
 
   User.findOne({
     _id: userId

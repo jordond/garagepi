@@ -153,10 +153,13 @@ function logout() {
  * Checks if the user role meets the minimum requirements of the route
  */
 function hasRole(roleRequired) {
-  if (!roleRequired) throw new Error('Required role needs to be set');
+  if (!roleRequired) {throw new Error('Required role needs to be set');}
 
   return compose()
     .use(function meetsRequirements(req, res, next) {
+      if (!config.secureApi) {return next();}
+      if (!req.user) {return res.status(404);}
+
       if (config.userRoles.indexOf(req.user.role) >= config.userRoles.indexOf(roleRequired)) {
         next();
       }
