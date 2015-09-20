@@ -233,5 +233,5 @@ module.exports = function (gulp, $, config) {
     .pipe(gulp.dest(config.buildJson));
   });
 
-  gulp.task('build', ['bowerInject', 'bowerAssets', 'images', 'fonts', 'json']);
+  gulp.task('build:client', ['bowerInject', 'bowerAssets', 'images', 'fonts', 'json']);
 };

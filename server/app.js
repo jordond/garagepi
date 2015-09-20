@@ -15,6 +15,7 @@ var log = require('./components/logger/console');
 mongoose.connection.on('connected', function () {
   // Setup server
   var app = express();
+  app.set('env', config.env || process.env.NODE_ENV);
   var server = require('http').createServer(app);
   var socketio = require('socket.io')(server, {
     serveClient: (config.env === 'production') ? false : true,
