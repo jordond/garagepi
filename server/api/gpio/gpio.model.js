@@ -5,10 +5,20 @@ var mongoose = require('mongoose'),
 
 var GpioSchema = new Schema({
   name: String,
-  description: String,
-  pin: Number,
-  direction: String,
-  value: {type: Boolean, default: false}
+  input: {
+    description: String,
+    pin: Number,
+    direction: String,
+    edge: String,
+    value: {type: Boolean, default: false}
+  },
+  output: {
+    description: String,
+    pin: Number,
+    direction: String,
+    edge: String,
+    value: {type: Boolean, default: false}
+  }
 });
 
 module.exports = mongoose.model('Gpio', GpioSchema);

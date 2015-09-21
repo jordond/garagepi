@@ -2,12 +2,22 @@
 
 var _ = require('lodash');
 var Gpio = require('./gpio.model');
+var gpioControl = require('../../components/gpio');
 
 // Get list of gpios
 exports.index = function (req, res) {
   Gpio.find(function (err, gpios) {
     if(err) { return handleError(res, err); }
     return res.status(200).json(gpios);
+  });
+};
+
+exports.toggle = function (req, res) {
+  Gpio.findById(req.params.id, function (err, gpio) {
+    if (err) { return handleError(res, err); }
+    if(!gpio) { return res.sendStatus(404); }
+    var toggled = gpioControl.toggle(req.params.id);
+    return res.status(200).json({toggled: toggled});
   });
 };
 

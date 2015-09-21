@@ -32,10 +32,15 @@ module.exports = function(app, secureApi) {
   app.route('/:url(api|auth|components|app|vendor|assets|fonts|images)/*')
    .get(errors[404]);
 
+  app.route('/api')
+    .get(function (req, res) {
+      res.status(200).json('Reached API');
+    });
+
   // All other routes should redirect to the index.html
   app.route('/*')
     .get(function(req, res) {
-      res.sendfile(app.get('appPath') + '/index.html');
+      res.sendFile(app.get('appPath') + '/index.html');
     });
 };
 

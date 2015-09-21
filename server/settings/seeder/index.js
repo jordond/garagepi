@@ -22,7 +22,7 @@ var TAG = 'Seeder';
  * Grabs the filenames of all files in ./seeds/, then passes that
  * information to the ./seeder.js
  */
-exports.seeder = function () {
+exports.seeder = function (finished) {
   var normalizedPath = path.join(__dirname, 'seeds');
 
   var acceptableSeedSettings = [false, true, 'override'];
@@ -66,6 +66,7 @@ exports.seeder = function () {
     count++;
     if (count === files.length) {
       log.info(TAG, 'Finished seeding database [' + count + '] seeds');
+      finished();
     }
   }
 }

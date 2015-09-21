@@ -10,6 +10,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 var express = require('express');
 var mongoose = require('mongoose');
 var config = require('./config');
+var gpio = require('./components/gpio');
 var log = require('./components/logger/console');
 
 mongoose.connection.on('connected', function () {
@@ -29,7 +30,11 @@ mongoose.connection.on('connected', function () {
   require('./routes')(app, config.secureApi);
 
   if(config.seedDB) {
-    require('./settings/seeder').seeder();
+    require('./settings/seeder').seeder(function () {
+      gpio.init();
+    });
+  } else {
+    gpio.init();
   }
 
   // Start server
@@ -57,6 +62,7 @@ mongoose.connection.on('disconnected', function () {
 function gracefulExit() {
   mongoose.connection.close(function () {
     log.log('Mongoose', 'App is terminating, closing connection to database');
+    gpio.close();
     process.exit(0);
   });
 }
