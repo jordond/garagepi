@@ -10,16 +10,27 @@ module.exports = {
     session: 'replace-me'
   },
 
-  // Port to run the server on
+  /**
+   * Port to run the server on
+   */
   // port: 5679,
 
-  // Should I seed the database, [true, false, initial]
-  // override = Always seed, ignore the replace flag on seed files. ALWAYS REPLACES
-  // true = Always seed, unless seed's `replace` is set to false
-  // false = Never seed, ever.
-  // seedDB: 'override',
+  /**
+   * Should I seed the database, [true, false, initial]
+   * override = Always seed, ignore the replace flag on seed files. ALWAYS REPLACES
+   * true = Always seed, unless seed's `replace` is set to false
+   * false = Never seed, ever.
+   */
+  //seedDB: true,
 
-  // Initial admin user to seed database with
+  /**
+   * Secure the API, development defaults to false, production defaults to true
+   */
+  //secureApi: true,
+
+  /**
+   * Default user for first run, please change password after first run
+   */
   initialUser: {
     name: 'Administrator',
     username: 'admin',
@@ -28,19 +39,27 @@ module.exports = {
     password: 'admin'
   },
 
-  // Token settings, default expiry of 3 hours in minutes
+  /**
+   * Token settings, default expiry of 3 hours in minutes
+   */
   // token: {
   //   expiry: 3 * 60
   // },
 
-  // Database address, and name
+  /**
+   * Database address, and name
+   */
   // mongo: {
-  //   uri: 'mongodb://address/db-name'
+  //   uri: 'mongodb://10.0.0.2/garagepi-dev'
   // },
 
-  // Environment to run, default is environment variables
-  // env: process.env.NODE_ENV,
+  /**
+   *  Environment to run, default is environment variables
+   */
+  //env: 'production',
 
-  // Control debug level for modules using visionmedia/debug
+  /**
+   * Control debug level for modules using visionmedia/debug
+   */
   DEBUG: ''
 };

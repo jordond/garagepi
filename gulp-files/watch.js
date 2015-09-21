@@ -19,7 +19,7 @@ module.exports = function (gulp, $, config) {
 
   gulp.task('watch', function () {
     $.browserSync.reload();
-    gulp.watch([config.serverFiles], ['server-copy']);
+    gulp.watch([config.serverFiles, 'env.js'], ['build:server']);
     gulp.watch([
         config.appFiles
       ], ['build', $.browserSync.reload]);
