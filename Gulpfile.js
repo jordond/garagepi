@@ -61,9 +61,14 @@ gulp.task('install', function (cb) {
   $.runSequence(['install:bower', 'install:node'], cb);
 });
 
-gulp.task('dev', ['server', 'build'], function () {
+gulp.task('dev', ['server', 'build:client'], function () {
   gulp.start('browserSync');
   gulp.start('watch');
+});
+
+gulp.task('build', function () {
+  gulp.start('build:server');
+  gulp.start('build:client');
 });
 
 gulp.task('default', ['dev']);

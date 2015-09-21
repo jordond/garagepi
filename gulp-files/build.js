@@ -34,8 +34,6 @@ module.exports = function (gulp, $, config) {
 
   // compile styles and copy into build directory
   gulp.task('styles', ['clean-app'], function () {
-    var lessFilter = $.filter('**/*.less');
-
     return gulp.src([
       config.appStyleFiles, config.appDir + '*.less'
     ])
@@ -49,9 +47,7 @@ module.exports = function (gulp, $, config) {
 
         this.emit('end');
       }}))
-      .pipe(lessFilter)
       .pipe($.less())
-      .pipe(lessFilter.restore())
       .pipe($.autoprefixer())
       .pipe($.if(isProd, $.cssRebaseUrls()))
       .pipe($.if(isProd, $.modifyCssUrls({
@@ -237,5 +233,5 @@ module.exports = function (gulp, $, config) {
     .pipe(gulp.dest(config.buildJson));
   });
 
-  gulp.task('build', ['bowerInject', 'bowerAssets', 'images', 'fonts', 'json']);
+  gulp.task('build:client', ['bowerInject', 'bowerAssets', 'images', 'fonts', 'json']);
 };

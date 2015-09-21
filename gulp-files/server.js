@@ -81,4 +81,6 @@ module.exports = function(gulp, $, config) {
   });
 
   gulp.task('server', ['nodemon']);
+
+  gulp.task('build:server', ['clean-server', 'copy-config']);
 };
