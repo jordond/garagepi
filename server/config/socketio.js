@@ -23,6 +23,7 @@ function onConnect(socket) {
     log.info(TAG, message);
   });
 
+  // Find all of the socket files and register them
   var pattern = config.api + '/**/*.socket.js';
   glob(pattern, function (err, files) {
     if (err) { return log.error(TAG, 'Error finding socket files', err); }

@@ -17,6 +17,8 @@ module.exports = {
             'mongodb://localhost/garagepi'
   },
 
+  secureApi: true,
+
   token: {
     expiry: 158 * 60
   },

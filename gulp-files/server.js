@@ -51,7 +51,7 @@ module.exports = function(gulp, $, config) {
 
   gulp.task('copy-config', ['clean-server', 'server-copy'], function () {
     if (fs.existsSync(config.localEnvFile)) {
-      return gulp.src(config.localEnvFile)
+      return gulp.src([config.localEnvFile, 'package.json', 'bower.json'])
         .pipe(gulp.dest(config.localEnvDest));
     } else {
       console.log('Local ENV.js file was not found, app will use unsafe defaults');
