@@ -32,20 +32,21 @@ function initialize() {
         log.info(TAG, 'Exporting [' + gpio.name + ']');
         setupPins(gpio);
       });
-      log.info(TAG, 'Initialization has completed');
+      log.info(TAG, 'Initialization has completed, [' + gpios.length + '] pairs exported');
     }
   });
 }
 
-function toggle(id) {
+function toggle(id, callback) {
+  var toggled = false;
   pins.forEach(function (pin) {
     if (pin.id === id) {
       log.info(TAG, 'Toggling [' + pin.name + '] door');
-      writeOutput(pin.output);
-      return true;
+      writeOutput(pin.door);
+      toggled = true;
     }
   });
-  return false;
+  return callback(toggled);
 }
 
 function close() {
@@ -70,17 +71,23 @@ function setupPins(gpio) {
   if (sensor) {
     sensor.read(function (err, value) {
       if (err) return handleError(err);
-      log.info(TAG, 'Reading ' + gpio.name + '\'s initial state, value [' + value + ']');
+      log.info(TAG, 'Reading ' + gpio.name + ' sensor\'s initial state, value [' + value + ']');
       setSensorStatus(gpio.input, value);
     });
     sensor.watch(function (err, value) {
       if (err) return handleError(err);
       log.info(TAG, gpio.name + ' sensor changed, value [' + value + ']');
-      setSensorStatus(gpio.input, value);
+      setSensorStatus(gpio.input, value, true);
+    });
+  }
+  if (door) {
+    door.write(1, function (err) {
+      if (err) { return handleError(err); }
+      log.info(TAG, 'Writing ' + gpio.name + ' door\'s initial state to on');
     });
   }
   pins.push({
-    id: gpio._id,
+    id: gpio.id,
     name: gpio.name,
     sensor: sensor,
     door: door
@@ -104,11 +111,13 @@ function createPin(settings, debounce) {
   }
 }
 
-function setSensorStatus(input, value) {
+function setSensorStatus(input, value, showLog) {
   input.value = value === 1 ? true : false;
   input.save(function (err) {
     if (err) return handleError(err);
-    log.log(TAG, 'Sensor status was saved');
+    if (showLog) {
+      log.log(TAG, 'Sensor status was saved');
+    }
   });
 }
 
@@ -121,10 +130,12 @@ function unexportPin(pin) {
 
 function writeOutput(output) {
   if (output) {
-    output.writeSync(0);
-    setTimeout(function() {
-      output.writeSync(1);
-    }, 200);
+    output.write(0, function (err) {
+      if (err) { return handleError(err); }
+      setTimeout(function() {
+        output.write(1);
+      }, 200);
+    });
   } else {
     log.warn(TAG, 'Output pin isn\'t set, not writing');
   }

@@ -40,7 +40,7 @@ exports.seeder = function (finished) {
   log.info(TAG, 'Starting Seeder in [' + mode + '] mode');
   log.info(TAG, 'Found [' + files.length + '] Seeds');
 
-  files.forEach(function(file) {
+  files.forEach(function (file) {
     try {
       seeder.start(file, config, seederCallback);
     } catch (err) {
