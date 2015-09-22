@@ -14,6 +14,7 @@ var gpio = require('./components/gpio');
 var log = require('./components/logger/console');
 
 mongoose.connection.on('connected', function () {
+  log.log('App', 'Connected to ' + config.mongo.uri + ']');
   // Setup server
   var app = express();
   app.set('env', config.env || process.env.NODE_ENV);

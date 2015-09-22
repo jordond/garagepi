@@ -68,14 +68,15 @@ function setupPins(gpio) {
   var sensor = createPin(gpio.input);
   var door = createPin(gpio.output);
   if (sensor) {
+    sensor.read(function (err, value) {
+      if (err) return handleError(err);
+      log.info(TAG, 'Reading ' + gpio.name + '\'s initial state, value [' + value + ']');
+      setSensorStatus(gpio.input, value);
+    });
     sensor.watch(function (err, value) {
       if (err) return handleError(err);
       log.info(TAG, gpio.name + ' sensor changed, value [' + value + ']');
-      gpio.input.value = value === 1 ? true : false;
-      gpio.save(function (err) {
-        if (err) return handleError(err);
-        log.debug(TAG, gpio.name + ' status was changed.');
-      });
+      setSensorStatus(gpio.input, value);
     });
   }
   pins.push({
@@ -95,12 +96,20 @@ function createPin(settings, debounce) {
       {debounceTimeout: debounce || 100}
     );
     pin.pin = settings.pin;
-    log.debug(TAG, 'Exported pin #[' + settings.pin + '] direction [' + settings.direction + ']');
+    log.info(TAG, 'Exported pin #[' + settings.pin + '] direction [' + settings.direction + ']');
     return pin;
   } catch (error) {
     log.error(TAG, 'Failed to export pin #[' + settings.pin +']');
     return false;
   }
+}
+
+function setSensorStatus(input, value) {
+  input.value = value === 1 ? true : false;
+  input.save(function (err) {
+    if (err) return handleError(err);
+    log.log(TAG, 'Sensor status was saved');
+  });
 }
 
 function unexportPin(pin) {

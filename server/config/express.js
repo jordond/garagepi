@@ -15,6 +15,7 @@ var errorHandler = require('errorhandler');
 var path = require('path');
 var config = require('./index');
 var passport = require('passport');
+var fs = require('fs');
 
 module.exports = function(app) {
   var env = app.get('env');
@@ -29,7 +30,12 @@ module.exports = function(app) {
   app.use(cookieParser());
   app.use(passport.initialize());
   if ('production' === env) {
-    app.use(favicon(path.join(config.root, 'client', 'favicon.ico')));
+    var faviconPath = path.join(config.root, 'client', 'favicon.ico');
+    fs.stat(faviconPath, function (err, stat) {
+      if (err === null) {
+        app.use(favicon(path.join(config.root, 'client', 'favicon.ico')));
+      }
+    });
     app.use(express.static(path.join(config.root, 'client')));
     app.use('/', express.static(path.join(config.client, 'client')));
     app.set('appPath', config.root + '/client');
