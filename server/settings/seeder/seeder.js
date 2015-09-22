@@ -34,7 +34,7 @@ exports.start = function (file, config, callback) {
     modelConfig.seedMode = config.seedDB;
     modelConfig.callback = callback;
 
-    pattern = config.root + '/**/' + modelConfig.modelName + '.model.js';
+    pattern = config.api + '/**/' + modelConfig.modelName + '.model.js';
     glob(pattern, function (err, files) {
       if (err) {throw err;}
 
