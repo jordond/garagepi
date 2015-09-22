@@ -21,6 +21,11 @@ module.exports = service;
  * Public functions
  */
 
+/**
+ * Setup all of the gpio pins
+ * Grabs all 'gpios' from the database, and will export each of them
+ * using 'onoff'.
+ */
 function initialize() {
   GpioModel.find(function (err, gpios) {
     if (err) return handleError(err);
@@ -37,6 +42,12 @@ function initialize() {
   });
 }
 
+/**
+ * Toggle the output gpio from the pin pair
+ * @param  {ObjectId}   id     Database id of the pin pair
+ * @param  {Function} callback Call when actions finished
+ * @return {Function}          The callback
+ */
 function toggle(id, callback) {
   var toggled = false;
   pins.forEach(function (pin) {
@@ -49,6 +60,9 @@ function toggle(id, callback) {
   return callback(toggled);
 }
 
+/**
+ * Cleanup all of the exported pins
+ */
 function close() {
   pins.forEach(function (pin) {
     unexportPin(pin.sensor);
@@ -61,13 +75,25 @@ function close() {
  * Private helpers
  */
 
+/**
+ * Generic error handler
+ * @param  {Object} err Error object
+ */
 function handleError(err) {
   return log.error(TAG, err.message || 'Generic error', err);
 }
 
+/**
+ * Setup the pin pair from the database
+ * First export the pin and create the object, if for some reason
+ * the exporting failed the returned object will be false
+ * For the sensor pin read and save the initial state and setup the watcher
+ * For the door pin write an initial on value, as the relay is default closed
+ * @param  {Object} gpio Pin pair containing the input and output pins
+ */
 function setupPins(gpio) {
-  var sensor = createPin(gpio.input);
-  var door = createPin(gpio.output);
+  var sensor = createPin(gpio.input, 600);
+  var door = createPin(gpio.output, 600);
   if (sensor) {
     sensor.read(function (err, value) {
       if (err) return handleError(err);
@@ -94,6 +120,14 @@ function setupPins(gpio) {
   });
 }
 
+/**
+ * Create the pin object by exporting the pin using 'onoff', using
+ * the passed in settings.  If the exporting fails, set the pin object
+ * to false.
+ * @param  {Object}  settings  Pin export settings
+ * @param  {Integer} debounce  Value of the debounce interval
+ * @return {Object}            Exported pin object, or false boolean
+ */
 function createPin(settings, debounce) {
   try {
     var pin = new Gpio(
@@ -111,6 +145,12 @@ function createPin(settings, debounce) {
   }
 }
 
+/**
+ * Save the sensor pins state to the database
+ * @param {Object}  input   Sensor database object
+ * @param {Integer} value   Current value of the pin
+ * @param {Boolean} showLog Display log message
+ */
 function setSensorStatus(input, value, showLog) {
   input.value = value === 1 ? true : false;
   input.save(function (err) {
@@ -121,6 +161,10 @@ function setSensorStatus(input, value, showLog) {
   });
 }
 
+/**
+ * Unexport the pin to free up the resource
+ * @param  {Object} pin Exported pin object
+ */
 function unexportPin(pin) {
   if (pin) {
     pin.unexport();
@@ -128,6 +172,11 @@ function unexportPin(pin) {
   }
 }
 
+/**
+ * Toggle the door pin, turn off, wait a bit, then turn
+ * the pin back on
+ * @param  {Object} output Pin object
+ */
 function writeOutput(output) {
   if (output) {
     output.write(0, function (err) {
