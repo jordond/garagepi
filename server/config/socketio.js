@@ -4,9 +4,12 @@
 
 'use strict';
 
+var TAG = 'Socket';
+
+var glob = require('glob');
+
 var config = require('./index');
 var log = require('../components/logger/console');
-var TAG = 'Socket';
 
 // When the user disconnects.. perform this
 function onDisconnect(socket) {
@@ -20,11 +23,15 @@ function onConnect(socket) {
     log.info(TAG, message);
   });
 
-  // Insert sockets below
-  require('../api/gpio/gpio.socket').register(socket);
-  require('../api/setting/setting.socket').register(socket);
-  require('../api/user/user.socket').register(socket);
-  require('../api/thing/thing.socket').register(socket);
+  // Find all of the socket files and register them
+  var pattern = config.api + '/**/*.socket.js';
+  glob(pattern, function (err, files) {
+    if (err) { return log.error(TAG, 'Error finding socket files', err); }
+    log.info(TAG, 'Registering [' + files.length + '] socket configs');
+    files.forEach(function (file) {
+      require(file).register(socket);
+    });
+  });
 }
 
 module.exports = function (socketio) {

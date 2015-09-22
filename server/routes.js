@@ -4,24 +4,25 @@
 
 'use strict';
 
+var TAG = 'Routes';
+
+var glob = require('glob');
+var path = require('path');
+
+var config = require('./config');
 var errors = require('./components/errors');
 var auth = require('./auth/auth.service');
-var debug = require('./components/errors/error.controller');
 var log = require('./components/logger/console');
 
-module.exports = function(app, secureApi) {
-  // Lock down api
+var debug = require('./components/errors/error.controller');
+
+module.exports = function(app, secureApi, callback) {
   if (secureApi) {
     app.use('/api', auth.isAuthenticated());
   } else {
     displayInsecureWarning();
   }
-
-  // Insert routes below
-  app.use('/api/gpios', require('./api/gpio'));
-  app.use('/api/settings', require('./api/setting'));
-  app.use('/api/things', require('./api/thing'));
-  app.use('/api/users', require('./api/user'));
+  registerApiRoutes(app, callback);
 
   app.use('/auth', require('./auth'));
 
@@ -43,6 +44,24 @@ module.exports = function(app, secureApi) {
       res.sendFile(app.get('appPath') + '/index.html');
     });
 };
+
+/**
+ * Find all of the api routes in '/server/api/<route>/index.js'
+ */
+function registerApiRoutes(app, callback) {
+  var pattern = config.api + '/**/index.js';
+  glob(pattern, function (err, files) {
+    if (err) { return log.error(TAG, 'Error finding route files', err); }
+    log.info(TAG, 'Found [' + files.length +'] routes');
+    files.forEach(function (file) {
+      var folders = path.dirname(file).split(path.sep);
+      var name = folders[folders.length - 1] + 's';
+      app.use('/api/' + name, require(file));
+      log.info(TAG, 'Registered route [/api/' + name + ']');
+    });
+    callback();
+  });
+}
 
 function displayInsecureWarning() {
   log.warn('Routes', '=======================================')

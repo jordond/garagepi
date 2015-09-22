@@ -25,34 +25,8 @@
         vm.loggedIn = loggedIn;
       });
 
-    $http.get('/api/things').success(function (awesomeThings) {
-      vm.awesomeThings = awesomeThings;
-      Socket.syncUpdates('thing', vm.awesomeThings)
-        .then(function () {
-          console.log('resolved');
-        }, null, function () {
-          console.log('notify');
-        });
-    });
-
     vm.refreshtoken = function () {
       Token.refresh();
     };
-
-    vm.addThing = function () {
-      if (vm.newThing === '') {
-        return;
-      }
-      $http.post('/api/things', {name: vm.newThing});
-      vm.newThing = '';
-    };
-
-    vm.deleteThing = function (thing) {
-      $http.delete('/api/things/' + thing._id);
-    };
-
-    $scope.$on('$destroy', function () {
-      Socket.unsyncUpdates('thing');
-    });
   }
 }());
