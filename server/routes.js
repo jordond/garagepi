@@ -17,32 +17,17 @@ var log = require('./components/logger/console');
 var debug = require('./components/errors/error.controller');
 
 module.exports = function(app, secureApi, callback) {
+  app.route('/api')
+    .get(function (req, res) {
+      res.status(200).json('Reached API');
+    });
+
   if (secureApi) {
     app.use('/api', auth.isAuthenticated());
   } else {
     displayInsecureWarning();
   }
   registerApiRoutes(app, callback);
-
-  app.use('/auth', require('./auth'));
-
-  app.get('/debug/error/', debug.index);
-  app.get('/debug/error/:code', debug.returnError);
-
-  // All undefined asset or api routes should return a 404
-  app.route('/:url(api|auth|components|app|vendor|assets|fonts|images)/*')
-   .get(errors[404]);
-
-  app.route('/api')
-    .get(function (req, res) {
-      res.status(200).json('Reached API');
-    });
-
-  // All other routes should redirect to the index.html
-  app.route('/*')
-    .get(function(req, res) {
-      res.sendFile(app.get('appPath') + '/index.html');
-    });
 };
 
 /**
@@ -55,12 +40,34 @@ function registerApiRoutes(app, callback) {
     log.info(TAG, 'Found [' + files.length +'] routes');
     files.forEach(function (file) {
       var folders = path.dirname(file).split(path.sep);
-      var name = folders[folders.length - 1] + 's';
-      app.use('/api/' + name, require(file));
-      log.info(TAG, 'Registered api route [/api/' + name + ']');
+      var name = folders[folders.length - 1];
+      app.use('/api/' + name + 's', require('./api/' + name));
+      log.info(TAG, 'Registered api route [/api/' + name + 's]');
     });
+    app.route('/api/*')
+      .get(function (req, res) {
+        res.status(404).json('Invalid api route');
+      });
+    registerOtherRoutes(app);
     callback();
   });
+}
+
+function registerOtherRoutes(app) {
+  app.use('/auth', require('./auth'));
+
+  app.get('/debug/error/', debug.index);
+  app.get('/debug/error/:code', debug.returnError);
+
+  // All undefined asset or api routes should return a 404
+  app.route('/:url(auth|components|app|vendor|assets|fonts|images)/*')
+   .get(errors[404]);
+
+  // All other routes should redirect to the index.html
+  app.route('/*')
+    .get(function (req, res) {
+      res.sendFile(app.get('appPath') + '/index.html');
+    });
 }
 
 function displayInsecureWarning() {
