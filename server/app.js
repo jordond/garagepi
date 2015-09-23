@@ -7,6 +7,8 @@
 // Set default node environment to development
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
+var TAG = 'App';
+
 var express = require('express');
 var mongoose = require('mongoose');
 var config = require('./config');
@@ -15,21 +17,21 @@ var log = require('./components/logger/console');
 
 // Kickstart the application
 mongoose.connect(config.mongo.uri, config.mongo.options);
-log.log('App', 'Attempting to connect to [' + config.mongo.uri + ']');
+log.log(TAG, 'Attempting to connect to [' + config.mongo.uri + ']');
 
 /**
  * Database event handlers
  */
 
 mongoose.connection.on('connected', function () {
-  log.log('App', 'Connected to ' + config.mongo.uri + ']');
-
+  log.log(TAG, 'Connected to ' + config.mongo.uri + ']');
+  log.log(TAG, 'Kickstarting server setup');
   setupServer();
 });
 
 mongoose.connection.on('error', function (err) {
   log.error('Mongoose', 'Failed to connect to database: ', err.message);
-  log.error('App', 'Connection to database failed, app will now terminate');
+  log.error(TAG, 'Connection to database failed, app will now terminate');
   process.exit(1);
 });
 
@@ -67,8 +69,10 @@ function setupServer() {
   // Setup server routes and start server
   require('./routes')(app, config.secureApi, function () {
     server.listen(config.port, config.ip, function () {
-      var message = 'Express server listening on ' + config.port + ', in ' + app.get('env') + ' mode';
-      log.info('App', message);
+      log.info(TAG, 'Express server listening on port [' + config.port + ']');
+      log.info(TAG, 'Environment [' + app.get('env') + ']');
+      log.info(TAG, 'Directory   [' + __dirname + ']');
+      log.info(TAG, 'Working Dir [' + process.cwd() + ']');
     });
   });
 

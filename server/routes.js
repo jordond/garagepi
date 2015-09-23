@@ -57,19 +57,19 @@ function registerApiRoutes(app, callback) {
       var folders = path.dirname(file).split(path.sep);
       var name = folders[folders.length - 1] + 's';
       app.use('/api/' + name, require(file));
-      log.info(TAG, 'Registered route [/api/' + name + ']');
+      log.info(TAG, 'Registered api route [/api/' + name + ']');
     });
     callback();
   });
 }
 
 function displayInsecureWarning() {
-  log.warn('Routes', '=======================================')
-  log.warn('Routes', '=  RUNNING WITH API IN INSECURE MODE  =');
+  log.warn('Routes', '=========================================')
+  log.warn('Routes', '=   RUNNING WITH API IN INSECURE MODE   =');
   if (process.env.NODE_ENV === 'production') {
-  log.warn('Routes', '= NO AUTHENTICATION REQUIRED FOR API  =');
-  log.warn('Routes', '= SET secureApi IN env.js!            =');
+    log.warn('Routes', '=  NO AUTHENTICATION REQUIRED FOR API   =');
+    log.warn('Routes', '=       SET secureApi IN env.js!        =');
   }
-  log.warn('Routes', '=Ignore this warning if it is intended=')
-  log.warn('Routes', '=======================================');
+  log.warn('Routes', '= Ignore this warning if it is intended =')
+  log.warn('Routes', '=========================================');
 }
