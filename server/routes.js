@@ -4,15 +4,13 @@
 
 'use strict';
 
-var TAG = 'Routes';
-
 var glob = require('glob');
 var path = require('path');
 
 var config = require('./config');
 var errors = require('./components/errors');
 var auth = require('./auth/auth.service');
-var log = require('./components/logger/console');
+var log = require('./components/logger/console')('Routes');
 
 var debug = require('./components/errors/error.controller');
 
@@ -36,13 +34,13 @@ module.exports = function(app, secureApi, callback) {
 function registerApiRoutes(app, callback) {
   var pattern = config.api + '/**/index.js';
   glob(pattern, function (err, files) {
-    if (err) { return log.error(TAG, 'Error finding route files', err); }
-    log.info(TAG, 'Found [' + files.length +'] routes');
+    if (err) { return log.error('Error finding route files', err); }
+    log.info('Found [' + files.length +'] routes');
     files.forEach(function (file) {
       var folders = path.dirname(file).split(path.sep);
       var name = folders[folders.length - 1];
       app.use('/api/' + name + 's', require('./api/' + name));
-      log.info(TAG, 'Registered api route [/api/' + name + 's]');
+      log.info('Registered api route [/api/' + name + 's]');
     });
     app.route('/api/*')
       .get(function (req, res) {
@@ -71,12 +69,12 @@ function registerOtherRoutes(app) {
 }
 
 function displayInsecureWarning() {
-  log.warn('Routes', '=========================================')
-  log.warn('Routes', '=   RUNNING WITH API IN INSECURE MODE   =');
+  log.warn('=========================================')
+  log.warn('=   RUNNING WITH API IN INSECURE MODE   =');
   if (process.env.NODE_ENV === 'production') {
-    log.warn('Routes', '=  NO AUTHENTICATION REQUIRED FOR API   =');
-    log.warn('Routes', '=       SET secureApi IN env.js!        =');
+    log.warn('=  NO AUTHENTICATION REQUIRED FOR API   =');
+    log.warn('=       SET secureApi IN env.js!        =');
   }
-  log.warn('Routes', '= Ignore this warning if it is intended =')
-  log.warn('Routes', '=========================================');
+  log.warn('= Ignore this warning if it is intended =')
+  log.warn('=========================================');
 }

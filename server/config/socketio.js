@@ -4,30 +4,27 @@
 
 'use strict';
 
-var TAG = 'Socket';
-
 var glob = require('glob');
 
 var config = require('./index');
-var log = require('../components/logger/console');
+var log = require('../components/logger/console')('Socket');
 
-// When the user disconnects.. perform this
+var sockets = {};
+
 function onDisconnect(socket) {
 }
 
-// When the user connects.. perform this
 function onConnect(socket) {
-  // When the client emits 'info', this listens and executes
+  sockets[socket.id] = socket;
   socket.on('info', function (data) {
     var message = '[' + socket.address + '] ' + JSON.stringify(data, null, 2);
-    log.info(TAG, message);
+    log.info(message);
   });
 
-  // Find all of the socket files and register them
-  var pattern = config.api + '/**/*.socket.js';
-  glob(pattern, function (err, files) {
-    if (err) { return log.error(TAG, 'Error finding socket files', err); }
-    log.info(TAG, 'Registering [' + files.length + '] socket configs');
+  // Find all of the api socket files and register them
+  glob(config.api + '/**/*.socket.js', function (err, files) {
+    if (err) { return log.error('Error finding socket files', err); }
+    log.info('Registering [' + files.length + '] socket configs');
     files.forEach(function (file) {
       require(file).register(socket);
     });
@@ -53,11 +50,11 @@ module.exports = function (socketio) {
     // Call onDisconnect.
     socket.on('disconnect', function () {
       onDisconnect(socket);
-      log.info(TAG, '[' + socket.address + '] DISCONNECTED');
+      log.info('[' + socket.address + '] DISCONNECTED');
     });
 
     // Call onConnect.
     onConnect(socket);
-    log.info(TAG, '[' + socket.address + '] CONNECTED');
+    log.info('[' + socket.address + '] CONNECTED');
   });
 };

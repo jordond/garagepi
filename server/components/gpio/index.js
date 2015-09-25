@@ -1,10 +1,8 @@
 'use strict';
 
-var TAG = 'Gpio';
-
 var Gpio = require('onoff').Gpio;
 var GpioModel = require('../../api/gpio/gpio.model');
-var log = require('../logger/console');
+var log = require('../logger/console')('Gpio');
 
 var pins = [];
 
@@ -30,14 +28,14 @@ function initialize() {
   GpioModel.find(function (err, gpios) {
     if (err) return handleError(err);
     if (!gpios.length) {
-      log.warn(TAG, 'No pins were found');
+      log.warn('No pins were found');
       return;
     } else {
       gpios.forEach(function (gpio) {
-        log.info(TAG, 'Exporting [' + gpio.name + ']');
+        log.info('Exporting [' + gpio.name + ']');
         setupPins(gpio);
       });
-      log.info(TAG, 'Initialization has completed, [' + gpios.length + '] pairs exported');
+      log.info('Initialization has completed, [' + gpios.length + '] pairs exported');
     }
   });
 }
@@ -52,7 +50,7 @@ function toggle(id, callback) {
   var toggled = false;
   pins.forEach(function (pin) {
     if (pin.id === id) {
-      log.info(TAG, 'Toggling [' + pin.name + '] door');
+      log.info('Toggling [' + pin.name + '] door');
       writeOutput(pin.door);
       toggled = true;
     }
@@ -68,7 +66,7 @@ function close() {
     unexportPin(pin.sensor);
     unexportPin(pin.door);
   });
-  log.info(TAG, 'Closed [' + pins.length + '] pin pairs');
+  log.info('Closed [' + pins.length + '] pin pairs');
 }
 
 /**
@@ -80,7 +78,7 @@ function close() {
  * @param  {Object} err Error object
  */
 function handleError(err) {
-  return log.error(TAG, err.message || 'Generic error', err);
+  return log.error(err.message || 'Generic error', err);
 }
 
 /**
@@ -97,19 +95,19 @@ function setupPins(gpio) {
   if (sensor) {
     sensor.read(function (err, value) {
       if (err) return handleError(err);
-      log.info(TAG, 'Reading ' + gpio.name + ' sensor\'s initial state, value [' + value + ']');
+      log.info('Reading ' + gpio.name + ' sensor\'s initial state, value [' + value + ']');
       setSensorStatus(gpio.input, value);
     });
     sensor.watch(function (err, value) {
       if (err) return handleError(err);
-      log.info(TAG, gpio.name + ' sensor changed, value [' + value + ']');
+      log.info(gpio.name + ' sensor changed, value [' + value + ']');
       setSensorStatus(gpio.input, value, true);
     });
   }
   if (door) {
     door.write(1, function (err) {
       if (err) { return handleError(err); }
-      log.info(TAG, 'Writing ' + gpio.name + ' door\'s initial state to on');
+      log.info('Writing ' + gpio.name + ' door\'s initial state to on');
     });
   }
   pins.push({
@@ -137,10 +135,10 @@ function createPin(settings, debounce) {
       {debounceTimeout: debounce || 100}
     );
     pin.pin = settings.pin;
-    log.info(TAG, 'Exported pin #[' + settings.pin + '] direction [' + settings.direction + ']');
+    log.info('Exported pin #[' + settings.pin + '] direction [' + settings.direction + ']');
     return pin;
   } catch (error) {
-    log.error(TAG, 'Failed to export pin #[' + settings.pin +']');
+    log.error('Failed to export pin #[' + settings.pin +']');
     return false;
   }
 }
@@ -156,7 +154,7 @@ function setSensorStatus(input, value, showLog) {
   input.save(function (err) {
     if (err) return handleError(err);
     if (showLog) {
-      log.log(TAG, 'Sensor status was saved');
+      log.log('Sensor status was saved');
     }
   });
 }
@@ -168,7 +166,7 @@ function setSensorStatus(input, value, showLog) {
 function unexportPin(pin) {
   if (pin) {
     pin.unexport();
-    log.info(TAG, 'Unexported pin #[' + pin.pin + ']');
+    log.info('Unexported pin #[' + pin.pin + ']');
   }
 }
 
@@ -186,6 +184,6 @@ function writeOutput(output) {
       }, 200);
     });
   } else {
-    log.warn(TAG, 'Output pin isn\'t set, not writing');
+    log.warn('Output pin isn\'t set, not writing');
   }
 }

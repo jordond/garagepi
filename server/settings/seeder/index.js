@@ -12,11 +12,9 @@
 var fs = require('fs');
 var path = require('path');
 
-var log = require('../../components/logger/console');
+var log = require('../../components/logger/console')('Seeder');
 var config = require('../../config');
 var seeder = require('./seeder');
-
-var TAG = 'Seeder';
 
 /**
  * Grabs the filenames of all files in ./seeds/, then passes that
@@ -27,7 +25,7 @@ exports.seeder = function (finished) {
 
   var acceptableSeedSettings = [false, true, 'override'];
   if (acceptableSeedSettings.indexOf(config.seedDB) === -1) {
-    log.error(TAG, 'Invalid config setting for [seedDB], defaulting to [true]');
+    log.error('Invalid config setting for [seedDB], defaulting to [true]');
     config.seedDB = true;
   }
 
@@ -37,14 +35,14 @@ exports.seeder = function (finished) {
   files.splice(files.indexOf('sample.seed.js'), 1);
 
   var mode = config.seedDB === 'override' ? config.seedDB : 'normal';
-  log.info(TAG, 'Starting Seeder in [' + mode + '] mode');
-  log.info(TAG, 'Found [' + files.length + '] Seeds');
+  log.info('Starting Seeder in [' + mode + '] mode');
+  log.info('Found [' + files.length + '] Seeds');
 
   files.forEach(function (file) {
     try {
       seeder.start(file, config, seederCallback);
     } catch (err) {
-      log.error(TAG, 'Failed to load seed file [' + file +']', err);
+      log.error('Failed to load seed file [' + file +']', err);
     }
   });
 
@@ -57,15 +55,15 @@ exports.seeder = function (finished) {
    */
   function seederCallback(err, modelName, message) {
     if (err) {
-      log.error(TAG, 'Failed to seed [' + modelName + ']', err);
+      log.error('Failed to seed [' + modelName + ']', err);
     } else if (message) {
-      log.info(TAG, message);
+      log.info(message);
     } else {
-      log.info(TAG, 'Finished seeding [' + modelName + ']');
+      log.info('Finished seeding [' + modelName + ']');
     }
     count++;
     if (count === files.length) {
-      log.info(TAG, 'Finished seeding database [' + count + '] seeds');
+      log.info('Finished seeding database [' + count + '] seeds');
       finished();
     }
   }

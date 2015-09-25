@@ -2,7 +2,7 @@
 
 var path = require('path');
 var fs = require('fs');
-var log = require('../components/logger/console');
+var log = require('../components/logger/console')('Config');
 var _ = require('lodash');
 
 function requiredProcessEnv(name) {
@@ -62,8 +62,8 @@ all = _.merge(all, require('./environment/' + process.env.NODE_ENV + '.js') || {
 if (fs.existsSync(all.root + '/env.js')) {
   all = _.merge(all, require(all.root + '/env.js'));
 } else {
-  log.error('Config', 'CONFIG FILE NOT FOUND, USING DEFAULTS (UNSAFE)');
-  log.error('Config', 'Seriously, its only okay for development!');
+  log.error('CONFIG FILE NOT FOUND, USING DEFAULTS (UNSAFE)');
+  log.error('Seriously, its only okay for development!');
 }
 
 module.exports = all;
