@@ -3,6 +3,7 @@
 var moment = require('moment');
 
 module.exports = function (tag) {
+  tag = tag !== '' ? 'App' : tag;
   return new Logger(tag);
 };
 
@@ -28,6 +29,10 @@ Logger.prototype.debug = function (message, data) {
 
 Logger.prototype.log = function (message, data) {
   this.toLog('log  ', message, data);
+};
+
+Logger.prototype.setTag = function (tag) {
+  this.tag = '[' + tag + '] ';
 };
 
 Logger.prototype.toLog = function (type, message, data) {

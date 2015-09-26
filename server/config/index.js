@@ -56,6 +56,7 @@ var all = {
 
 // Export the config object based on the NODE_ENV
 all = _.merge(all, require('./environment/' + process.env.NODE_ENV + '.js') || {});
+all = _.merge(all, require('./camera'));
 
 // Export the config object for local env
 // ==============================================

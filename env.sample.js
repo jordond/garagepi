@@ -11,6 +11,18 @@ module.exports = {
   },
 
   /**
+   * Configuation for webcam capture
+   * defaults - directory: /var/tmp/motion
+   *            config   : server/components/camera/motion.conf
+   *            fps      : 24fps
+   *            rotate   : 0 degrees {0, 90, 180}
+   */
+  //motionDirectory: '/var/tmp/motion',
+  //motionConfig: '',
+  //cameraFps: 24,
+  //cameraRotate: 0,
+
+  /**
    * Port to run the server on
    */
   // port: 5679,
