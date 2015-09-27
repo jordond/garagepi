@@ -28,8 +28,11 @@ var all = {
   port: process.env.PORT || 9000,
 
   // Log levels
-  logLevels: ['ALL', 'VERBOSE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'LOG'],
-  logLevel: 'ALL',
+  log : {
+    levels: ['ALL', 'VERBOSE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'LOG'],
+    level: 'ALL',
+    default: 'INFO'
+  },
 
   // Should we populate the DB with sample data?
   seedDB: false,

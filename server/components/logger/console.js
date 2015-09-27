@@ -56,14 +56,14 @@ Logger.prototype.toLog = function (type, message, data) {
 
 function canOutput(outLevel) {
   outLevel = outLevel.trim();
-  var level = config.logLevel.toUpperCase();
-  var levelIndex = config.logLevels.indexOf(level);
-  var outIndex = config.logLevels.indexOf(outLevel.toUpperCase());
+  var level = config.log.level.toUpperCase();
+  var levelIndex = config.log.levels.indexOf(level);
+  var outIndex = config.log.levels.indexOf(outLevel.toUpperCase());
   if (outIndex >= levelIndex && levelIndex !== -1) {
     return true;
   }
   // When the user entered loglevel is invalid
-  return outIndex >= config.logLevels.indexOf('INFO');
+  return outIndex >= config.logLevels.indexOf(config.log.default);
 }
 
 function timestamp() {

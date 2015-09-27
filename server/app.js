@@ -14,11 +14,11 @@ var gpio = require('./components/gpio');
 var log = require('./components/logger/console')('App');
 
 // Check logger level
-var level = config.logLevel.toUpperCase();
-if (config.logLevels.indexOf(level) === -1) {
+var level = config.log.level.toUpperCase();
+if (config.log.levels.indexOf(level) === -1) {
   log.warn('Ignoring invalid log level');
 }
-log.log('Using log level [INFO]');
+log.log('Using log level [' + config.log.default + ']');
 
 // Kickstart the application
 mongoose.connect(config.mongo.uri, config.mongo.options);
