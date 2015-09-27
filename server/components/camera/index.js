@@ -7,56 +7,93 @@ var spawn    = require('child_process').spawn;
 var log      = require('../logger/console')('Camera');
 var config   = require('../../config').camera;
 
-var fswebcam = require('./fswebcam');
-var motion   = require('./motion');
+var fswebcam = require('./fswebcam')();
+var motion   = require('./motion')();
 
-var frameDir     = config.extra.target_dir
+var sockets      = {}
+  , frameDir     = config.extra.target_dir
   , frameData
   , frameWatcher
-  , motion
+  , canStream    = true
   , isStreaming  = false;
 
 var imageToWatch = path.join(frameDir, config.filename + '.jpg');
 
 var service = {
+  init      : init,
+  canStream : canStream,
   register  : register,
   unregister: unregister
 };
 
-module.exports = function () {
-  log.log('Initializing camera module');
-  fs.stat(frameDir, function (err) {
-    if (err) {
-      log.info('Creating capture directory [' + frameDir + ']');
-      fs.mkdirSync(frameDir);
-    }
-    log.info('Using [' + frameDir + '] for frame capture');
-  });
-  return service;
-};
+module.exports = service;
 
 /**
  * Public Functions
  */
 
+function init(callback) {
+  log.log('Initializing camera module');
+  fs.stat(config.extra.videodevice, function (err) {
+    if (err) {
+      log.error('Video device [' + config.extra.videodevice + '] not found')
+      canStream = false;
+      return callback(err, 'Not found');
+    }
+    fs.stat(frameDir, onDirStat);
+  });
+
+  function onDirStat(err) {
+    if (err) {
+      log.info('Creating capture directory [' + frameDir + ']');
+      fs.mkdirSync(frameDir);
+    }
+    log.info('Using [' + frameDir + '] for frame capture');
+  }
+}
+
 function register(socket) {
-  socket.on('stream:start', function () {
-    startStreaming(socket);
+  if (!canStream) {
+    log.warn('Not registering streaming, no video device present');
+    return;
+  }
+  sockets[socket.id] = socket;
+  socket.on('stream:start', function (id) {
+    startStreaming(sockets[id]);
+  });
+  socket.on('stream:pause', function (id) {
+    if (sockets.hasOwnProperty(id)) {
+      sockets[id].paused = true;
+    }
   });
 }
 
-function unregister(clients) {
-  if (clients === 0) {
-    stopStreaming();
-  }
+function unregister(socket) {
+  removeClient(socket.id);
 }
 
 /**
  * Private Helpers
  */
 
+function removeClient(id) {
+  if (!id) {
+    return log.error('[remove] No socket id was supplied');
+  } else if (sockets.hasOwnProperty(id)) {
+    log.info('Removing client [' + id + ']');
+    delete sockets[id];
+    if (Object.keys(sockets).length === 0 && isStreaming) {
+      log.info('All clients gone, stopping streaming');
+      stopStreaming();
+    }
+  }
+}
+
 function startStreaming(socket) {
-  if (isStreaming) {
+  if (!socket) {
+    return log.error('[start] No socket was supplied');
+  } else if (isStreaming) {
+    log.info('[start] Already streaming, sending last frame');
     return socket.volatile.emit('frame', frameData);
   }
   log.info('Initializing the frame capture')
@@ -64,7 +101,7 @@ function startStreaming(socket) {
   fswebcam.capture(onCapture);
 
   function onCapture(wasSuccess) {
-    isStreaming = wasSuccess
+    isStreaming = wasSuccess;
     if (wasSuccess) {
       readFrame(function (wasRead) {
         log.info('Emitting initial frame');
@@ -109,12 +146,18 @@ function readFrame(callback) {
 }
 
 function startWatcher(socket) {
+  var fps = config.fps;
+  if (fps > 30 || fps <= 0) {
+    log.warn('FPS of [' + fps + '] not valid [1-30], defaulting to [24]');
+    fps = 24;
+  }
   log.info('Watching file [' + imageToWatch + ']');
-  frameWatcher = setInterval(checkFrame, 1000 / config.fps);
+  log.info('Streaming camera at [' + fps + 'fps]');
+  frameWatcher = setInterval(onInterval, 1000 / fps);
 
-  function checkFrame() {
+  function onInterval() {
     readFrame(function (wasRead) {
-      if (wasRead) {
+      if (wasRead && !socket.paused) {
         socket.volatile.emit('frame', frameData);
       }
     });

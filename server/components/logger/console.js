@@ -3,7 +3,7 @@
 var moment = require('moment');
 
 module.exports = function (tag) {
-  tag = tag !== '' ? 'App' : tag;
+  tag = tag === '' ? 'App' : tag;
   return new Logger(tag);
 };
 

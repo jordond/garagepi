@@ -9,13 +9,17 @@ var log    = require('../logger/console')('FSWebcam');
 
 module.exports = function (filename) {
   filename = filename ? filename :
-    path.join(config.extra.targetDir, config.filename + '.jpg');
+    path.join(config.extra.target_dir, config.filename + '.jpg');
   return new FSWebcam(filename);
 }
 
 function FSWebcam(filename) {
   this.process = null;
-  this.arguments = ['-q', '--no-banner'];
+  this.arguments = [
+    '-q',
+    '-d', config.extra.videodevice,
+    '--no-banner'
+  ];
 
   var rotateValue = config.extra.rotate;
   if (config.allowedRotate.indexOf(rotateValue) !== -1) {
@@ -24,12 +28,13 @@ function FSWebcam(filename) {
     this.arguments.push(rotateValue);
   }
   this.arguments.push(filename);
+  log.log('Initialized');
 }
 
 FSWebcam.prototype.capture = function (callback) {
   log.info('Spawning process');
   this.process = spawn('fswebcam', this.arguments);
-  this.process.stdderr.on('data', onError);
+  this.process.stderr.on('data', onError);
   this.process.on('exit', onExit);
 
   function onError(data) {

@@ -28,5 +28,25 @@
     vm.refreshtoken = function () {
       Token.refresh();
     };
+
+    vm.start = function () {
+      Socket.wrapper.emit('stream:start', Socket.wrapper.id);
+      Socket.wrapper.on('frame', function (data) {
+        console.log('recieved frame');
+        $scope.$apply(function () {
+          vm.frame = data;
+        });
+      });
+      Socket.wrapper.on('frame:initial', function (data) {
+        console.log('recieved INITIAL frame');
+        vm.frame = data;
+      });
+      Socket.wrapper.on('frame:loading', function () {
+        console.log('LOADING FRAME');
+      });
+    };
+    vm.stop = function () {
+      Socket.wrapper.emit('stream:pause', Socket.wrapper.id);
+    };
   }
 }());

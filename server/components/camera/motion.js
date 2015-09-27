@@ -7,6 +7,8 @@ var spawn  = require('child_process').spawn;
 var config = require('../../config').camera;
 var log    = require('../logger/console')('Motion');
 
+var logFilename = 'motion.log';
+
 module.exports = function () {
   return new Motion();
 }
@@ -14,17 +16,25 @@ module.exports = function () {
 function Motion() {
   this.process = null;
   this.configWritten = false;
-  this.arguments = ['-n', '-c', config.motionConfig];
+  this.arguments = [
+    '-n',
+    '-c', config.configPath,
+    '-l', logPath()
+  ];
 
-  var rotateValue = config.cameraRotate;
+  var rotateValue = config.extra.rotate;
   if (config.allowedRotate.indexOf(rotateValue) !== -1) {
     log.info('Rotating the frame [' + rotateValue + '°]');
   } else {
     config.extra.rotate = 0;
   }
 
+  var that = this;
   writeConfig(function () {
-    this.configWritten = true;
+    that.configWritten = true;
+    rotateLog(function () {
+      log.log('Initialized');
+    });
   });
 }
 
@@ -35,11 +45,12 @@ Motion.prototype.start = function (callback) {
   }
   log.info('Spawning process');
   this.process = spawn('motion', this.arguments);
-  this.process.stdderr.on('data', onError);
+  this.process.stderr.on('data', onOutput);
+  this.process.stdout.on('data', onOutput);
   this.process.on('exit', onExit);
 
-  function onError(data) {
-    log.error('stderr: ' + data);
+  function onOutput(data) {
+    log.error('[Process] ' + data);
   }
 
   function onExit(code) {
@@ -62,24 +73,45 @@ Motion.prototype.stop = function () {
 function writeConfig(callback) {
   fs.stat(config.configPath, function (err) {
     if (!err) {
-      log.log('Deleting existing config');
+      log.debug('Deleting existing config');
       fs.unlinkSync(config.configPath);
     }
     log.info('Writing camera config file');
+    log.debug('Camera config location [' + config.configPath + ']');
 
     var stream = fs.createWriteStream(config.configPath);
     stream.once('open', function (fd) {
+      log.debug('|=======================================');
+      log.debug('| Config options:');
+      log.debug('| ---------------');
       for (var key in config.extra) {
         if (config.extra.hasOwnProperty(key)) {
-          stream.write(key + ' ' + config.extra[key]);
+          log.debug('| ' + key + ': ' + config.extra[key]);
+          stream.write(key + ' ' + config.extra[key] + '\n');
         }
       }
-      stream.write('picture_filename ' + config.filename);
-      stream.write('jpeg_filename ' + config.filename);
+      stream.write('picture_filename ' + config.filename + '\n');
+      stream.write('jpeg_filename ' + config.filename + '\n');
       stream.write('snapshot_filename ' + config.filename);
-      log.info('Saving camera config file');
+      log.debug('| frame_filename: ' + config.filename + '.jpg');
+      log.debug('|=======================================');
+      log.debug('Saved camera config file');
       stream.end();
       callback();
     });
   });
+}
+
+function rotateLog(callback) {
+  fs.rename(logPath(), logPath() + '.old', function (err) {
+    if (!err) {
+      log.debug('Rotating [' + logPath() + '.old]');
+    }
+    log.info('Using [' + logPath() + '] as logfile');
+    callback();
+  });
+}
+
+function logPath() {
+  return path.join(config.logPath, logFilename);
 }

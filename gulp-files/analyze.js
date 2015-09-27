@@ -19,7 +19,7 @@ module.exports = function (gulp, $, config) {
       }}))
       .pipe(jsFilter)
       .pipe($.eslint())
-      .pipe($.eslint.formatEach('./node_modules/eslint-path-formatter'))
+      .pipe($.eslint.format('./node_modules/eslint-path-formatter'))
       .pipe($.eslint.failOnError())
       .pipe($.jshint())
       .pipe($.jshint.reporter('jshint-stylish'))
