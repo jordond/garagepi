@@ -26,6 +26,9 @@ function Motion() {
   if (config.allowedRotate.indexOf(rotateValue) !== -1) {
     log.info('Rotating the frame [' + rotateValue + '°]');
   } else {
+    if (rotateValue !== 0) {
+      log.warn('Invalid roatation degree specified [' + rotateValue + '°], defaulting to [0°]');
+    }
     config.extra.rotate = 0;
   }
 
@@ -50,7 +53,7 @@ Motion.prototype.start = function (callback) {
   this.process.on('exit', onExit);
 
   function onOutput(data) {
-    log.error('[Process] ' + data);
+    log.log('[Process] ' + data);
   }
 
   function onExit(code) {

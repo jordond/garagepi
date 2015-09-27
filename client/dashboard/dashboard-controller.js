@@ -30,12 +30,10 @@
     };
 
     vm.start = function () {
-      Socket.wrapper.emit('stream:start', Socket.wrapper.id);
+      Socket.wrapper.emit('stream:start', Socket.id);
       Socket.wrapper.on('frame', function (data) {
         console.log('recieved frame');
-        $scope.$apply(function () {
-          vm.frame = data;
-        });
+        vm.frame = data;
       });
       Socket.wrapper.on('frame:initial', function (data) {
         console.log('recieved INITIAL frame');
@@ -46,7 +44,7 @@
       });
     };
     vm.stop = function () {
-      Socket.wrapper.emit('stream:pause', Socket.wrapper.id);
+      Socket.wrapper.emit('stream:pause', Socket.id);
     };
   }
 }());

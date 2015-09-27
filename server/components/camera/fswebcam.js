@@ -26,6 +26,10 @@ function FSWebcam(filename) {
     log.info('Rotating the frame [' + rotateValue + '°]');
     this.arguments.push('--rotate');
     this.arguments.push(rotateValue);
+  } else {
+    if (rotateValue !== 0) {
+      log.warn('Ignoring invalid rotation degree specified [' + rotateValue + '°]');
+    }
   }
   this.arguments.push(filename);
   log.log('Initialized');

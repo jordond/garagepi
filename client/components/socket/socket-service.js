@@ -28,6 +28,7 @@
      * Public Members
      */
 
+    self.id            = undefined;
     self.wrapper       = undefined;
     self.init          = init;
     self.syncUpdates   = syncUpdates;
@@ -210,6 +211,7 @@
 
       socket.on('connect', function () {
         self.wrapper.socket(socket);
+        self.id = socket.id;
         registerSocketEvents(socket);
         log('Connected');
         deferred.resolve();

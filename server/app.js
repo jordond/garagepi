@@ -74,14 +74,24 @@ function setupServer() {
     });
   });
 
-  process.on('SIGINT', gracefulExit).on('SIGTERM', gracefulExit);
+  process
+    .on('SIGINT', gracefulExit)
+    .on('SIGTERM', gracefulExit)
+    .on('exit', finish);
+
   exports = module.exports = app;
 }
 
 function gracefulExit() {
+  log.log('Triggering application shutdown');
+  gpio.close();
   mongoose.connection.close(function () {
-    log.log('App is terminating, closing connection to database');
-    gpio.close();
+    log.log('Closing connection to the database');
     process.exit(0);
   });
+}
+
+function finish(code) {
+  log.info('Node is about to exit with code [' + code + ']');
+  process.exit(code);
 }

@@ -38,10 +38,14 @@ function init(callback) {
     if (err) {
       log.error('Video device [' + config.extra.videodevice + '] not found')
       canStream = false;
-      return callback(err, 'Not found');
     }
     fs.stat(frameDir, onDirStat);
   });
+
+  process
+    .on('SIGINT', stopStreaming)
+    .on('SIGTERM', stopStreaming)
+    .on('exit', stopStreaming);
 
   function onDirStat(err) {
     if (err) {
@@ -54,7 +58,7 @@ function init(callback) {
 
 function register(socket) {
   if (!canStream) {
-    log.warn('Not registering streaming, no video device present');
+    log.error('Not registering streaming, no video device present');
     return;
   }
   sockets[socket.id] = socket;
@@ -63,6 +67,7 @@ function register(socket) {
   });
   socket.on('stream:pause', function (id) {
     if (sockets.hasOwnProperty(id)) {
+      log.info('Socket [' + id + '] has paused streaming');
       sockets[id].paused = true;
     }
   });
@@ -82,6 +87,7 @@ function removeClient(id) {
   } else if (sockets.hasOwnProperty(id)) {
     log.info('Removing client [' + id + ']');
     delete sockets[id];
+    log.debug('Remaining clients [' + Object.keys(sockets).length + ']');
     if (Object.keys(sockets).length === 0 && isStreaming) {
       log.info('All clients gone, stopping streaming');
       stopStreaming();
@@ -93,7 +99,7 @@ function startStreaming(socket) {
   if (!socket) {
     return log.error('[start] No socket was supplied');
   } else if (isStreaming) {
-    log.info('[start] Already streaming, sending last frame');
+    log.info('[start] Already streaming, resuming last frame');
     return socket.volatile.emit('frame', frameData);
   }
   log.info('Initializing the frame capture')
@@ -113,10 +119,12 @@ function startStreaming(socket) {
 }
 
 function stopStreaming() {
-  isStreaming = false;
-  frameData = null;
-  motion.stop();
-  stopWatcher();
+  if (isStreaming) {
+    isStreaming = false;
+    frameData = null;
+    motion.stop();
+    stopWatcher();
+  }
 }
 
 function startMotionCapture(socket) {

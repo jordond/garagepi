@@ -8,7 +8,7 @@
     </div>
   </div>
   <div class="row">
-    <img ng-src="data:image/jpeg;base64,{{ vm.frame }}" alt="">
+    <img ng-src="{{'data:image/jpeg;base64,'+vm.frame}}" alt="webcam">
   </div>
 
   <div class="btn btn-primary" ng-click="vm.refreshtoken()">refresh token</div>
