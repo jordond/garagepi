@@ -23,6 +23,14 @@ module.exports = {
   //cameraRotate: 0,
 
   /**
+   * Console log level
+   * ALL - Display all * default for dev
+   * DEBUG - Display up-to debug
+   * INFO - Display up to info * default for prod
+   */
+  //logLevel: 'INFO',
+
+  /**
    * Port to run the server on
    */
   // port: 5679,

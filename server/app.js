@@ -13,6 +13,13 @@ var config = require('./config');
 var gpio = require('./components/gpio');
 var log = require('./components/logger/console')('App');
 
+// Check logger level
+var level = config.logLevel.toUpperCase();
+if (config.logLevels.indexOf(level) === -1) {
+  log.warn('Ignoring invalid log level');
+}
+log.log('Using log level [INFO]');
+
 // Kickstart the application
 mongoose.connect(config.mongo.uri, config.mongo.options);
 log.log('Attempting to connect to [' + config.mongo.uri + ']');

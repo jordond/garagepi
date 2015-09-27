@@ -27,6 +27,10 @@ var all = {
   // Server port
   port: process.env.PORT || 9000,
 
+  // Log levels
+  logLevels: ['ALL', 'VERBOSE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'LOG'],
+  logLevel: 'ALL',
+
   // Should we populate the DB with sample data?
   seedDB: false,
 
@@ -53,6 +57,7 @@ var all = {
   },
 
 };
+
 
 // Export the config object based on the NODE_ENV
 all = _.merge(all, require('./environment/' + process.env.NODE_ENV + '.js') || {});

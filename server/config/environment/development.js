@@ -8,6 +8,8 @@ module.exports = {
     uri: 'mongodb://localhost/garagepi-dev'
   },
 
+  logLevel: 'ALL',
+
   // API WILL NOT REQUIRE AUTHENTICATION
   secureApi: false,
 
