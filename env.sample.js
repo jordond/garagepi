@@ -12,15 +12,20 @@ module.exports = {
 
   /**
    * Configuation for webcam capture
-   * defaults - directory: /var/tmp/motion
-   *            config   : server/components/camera/motion.conf
-   *            fps      : 24fps
-   *            rotate   : 0 degrees {0, 90, 180}
+   * Some defaults, visit link below for more
+   * http://www.lavrsen.dk/foswiki/bin/view/Motion/ConfigFileOptions
    */
-  //motionDirectory: '/var/tmp/motion',
-  //motionConfig: '',
-  //cameraFps: 24,
-  //cameraRotate: 0,
+  // camera: {
+  //   configPath: 'server/components/camera/motion.conf',
+  //   logPath: '/tmp',
+  //   fps: 24,
+  //   filename: 'frame',
+  //   extra: {
+  //     videodevice: '/dev/video0',
+  //     target_dir: '/var/tmp/motion',
+  //     quality: 60
+  //   }
+  // }
 
   /**
    * Console log level
@@ -28,7 +33,9 @@ module.exports = {
    * DEBUG - Display up-to debug
    * INFO - Display up to info * default for prod
    */
-  //logLevel: 'INFO',
+  // log: {
+  //   level: 'INFO'
+  // },
 
   /**
    * Port to run the server on

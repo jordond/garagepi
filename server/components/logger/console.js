@@ -63,7 +63,10 @@ function canOutput(outLevel) {
     return true;
   }
   // When the user entered loglevel is invalid
-  return outIndex >= config.logLevels.indexOf(config.log.default);
+  if (levelIndex === -1) {
+    return outIndex >= config.log.levels.indexOf(config.log.default);
+  }
+  return false;
 }
 
 function timestamp() {

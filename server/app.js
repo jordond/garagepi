@@ -17,8 +17,9 @@ var log = require('./components/logger/console')('App');
 var level = config.log.level.toUpperCase();
 if (config.log.levels.indexOf(level) === -1) {
   log.warn('Ignoring invalid log level');
+  level = config.log.default;
 }
-log.log('Using log level [' + config.log.default + ']');
+log.log('Using log level [' + level + ']');
 
 // Kickstart the application
 mongoose.connect(config.mongo.uri, config.mongo.options);

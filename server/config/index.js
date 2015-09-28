@@ -30,7 +30,7 @@ var all = {
   // Log levels
   log : {
     levels: ['ALL', 'VERBOSE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'LOG'],
-    level: 'ALL',
+    level: 'INFO',
     default: 'INFO'
   },
 
