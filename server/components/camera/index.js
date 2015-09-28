@@ -7,8 +7,8 @@ var spawn    = require('child_process').spawn;
 var log      = require('../logger/console')('Camera');
 var config   = require('../../config').camera;
 
-var fswebcam = require('./fswebcam')();
-var motion   = require('./motion')();
+var fswebcam;
+var motion;
 
 var sockets      = {}
   , frameDir     = config.extra.target_dir
@@ -34,6 +34,9 @@ module.exports = service;
 
 function init(callback) {
   log.log('Initializing camera module');
+  fswebcam = require('./fswebcam')();
+  motion = require('./motion')();
+
   fs.stat(config.extra.videodevice, function (err) {
     if (err) {
       log.error('Video device [' + config.extra.videodevice + '] not found')

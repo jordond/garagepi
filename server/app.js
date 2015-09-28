@@ -75,10 +75,10 @@ function setupServer() {
   // Setup server routes and start server
   require('./routes')(app, config.secureApi, function () {
     server.listen(config.port, config.ip, function () {
-      log.info('Express server listening on port [' + config.port + ']');
-      log.info('Environment [' + app.get('env') + ']');
-      log.info('Directory   [' + __dirname + ']');
-      log.info('Working Dir [' + process.cwd() + ']');
+      log.log('Express server listening on port [' + config.port + ']');
+      log.log('Environment [' + app.get('env') + ']');
+      log.log('Directory   [' + __dirname + ']');
+      log.log('Working Dir [' + process.cwd() + ']');
     });
   });
 
@@ -100,6 +100,6 @@ function gracefulExit() {
 }
 
 function finish(code) {
-  log.info('Node is about to exit with code [' + code + ']');
+  log.log('Node is about to exit with code [' + code + ']');
   process.exit(code);
 }

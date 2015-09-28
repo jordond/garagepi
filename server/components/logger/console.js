@@ -1,5 +1,6 @@
 'use strict';
 
+var chalk = require('chalk');
 var moment = require('moment');
 
 var config;
@@ -19,34 +20,46 @@ Logger.prototype.verbose = function (message, data) {
 }
 
 Logger.prototype.debug = function (message, data) {
-  this.toLog('debug', message, data);
+  var bg = chalk.magenta;
+  this.toLog('debug', message, data, bg, bg, bg);
 };
 
 Logger.prototype.info = function (message, data) {
-  this.toLog('info ', message, data);
+  var bg = chalk.cyan;
+  var type = chalk.cyan;
+  this.toLog('info ', message, data, type, bg, bg);
 };
 
 Logger.prototype.warn = function (message, data) {
-  this.toLog('warn ', message, data);
+  var type = chalk.bold.bgYellow;
+  var bg = chalk.bold.yellow;
+  this.toLog('warn ', message, data, type, bg, bg);
 };
 
 Logger.prototype.error = function (message, data) {
-  this.toLog('error', message, data);
+  var type = chalk.bold.bgRed;
+  var bg = chalk.bold.red;
+  this.toLog('error', message, data, type, bg, bg);
 };
 
 Logger.prototype.log = function (message, data) {
-  this.toLog('log  ', message, data);
+  var bg = chalk.green;
+  this.toLog('log  ', message, data, bg, bg, bg);
 };
 
 Logger.prototype.setTag = function (tag) {
   this.tag = '[' + tag + '] ';
 };
 
-Logger.prototype.toLog = function (type, message, data) {
+Logger.prototype.toLog = function (type, message, data, tyCol, tagCol, msgCol) {
   if (canOutput(type)) {
     type = '[' + type.toUpperCase() + ']';
     data = data ? data : '';
-    console.log(timestamp() + type + this.tag + message + data);
+    if (tyCol && tagCol && msgCol) {
+      console.log(chalk.dim(timestamp()) + tyCol(type) + tagCol(this.tag) + msgCol(message) + data );
+    } else {
+      console.log(chalk.dim(timestamp()) + type + this.tag + message + data);
+    }
   }
 }
 
