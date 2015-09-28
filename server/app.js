@@ -54,7 +54,7 @@ function setupServer() {
   app.set('env', config.env || process.env.NODE_ENV);
   var server = require('http').createServer(app);
   var socketio = require('socket.io')(server, {
-    serveClient: (config.env === 'production') ? false : true,
+    serveClient: (config.env === 'production') ? true : true,
     path: '/socket.io-client'
   });
 
@@ -84,8 +84,8 @@ function setupServer() {
 
   process
     .on('SIGINT', gracefulExit)
-    .on('SIGTERM', gracefulExit)
-    .on('exit', finish);
+    .on('SIGTERM', gracefulExit);
+    //.on('exit', finish);
 
   exports = module.exports = app;
 }
@@ -99,7 +99,12 @@ function gracefulExit() {
   });
 }
 
-function finish(code) {
-  log.log('Node is about to exit with code [' + code + ']');
+function finish(code, err) {
+  var message = 'Node is about to exit with code [' + code + ']'
+  if (code === 0) {
+    log.log(message);
+  } else {
+    log.error(message, err);
+  }
   process.exit(code);
 }

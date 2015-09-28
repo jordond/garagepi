@@ -8,7 +8,6 @@ var glob = require('glob');
 
 var config = require('./index');
 var log = require('../components/logger/console')('Socket');
-var camera = require('../components/camera');
 
 module.exports = function (socketio) {
   // In order to see all the debug output, set DEBUG (in server/config/local.env.js) to including the desired scope.
@@ -19,8 +18,6 @@ module.exports = function (socketio) {
       handshake: true
     }));
   }
-
-  camera.init();
 
   socketio.on('connection', function (socket) {
     socket.connectedAt = new Date();
@@ -33,6 +30,8 @@ module.exports = function (socketio) {
 
     onConnect(socket);
   });
+
+  require('../components/camera/camera.socket').init(socketio);
 };
 
 /**
@@ -54,11 +53,9 @@ function onConnect(socket) {
     files.forEach(function (file) {
       require(file).register(socket);
     });
-    camera.register(socket);
   });
 }
 
 function onDisconnect(socket) {
   log.info('[' + socket.address + '] DISCONNECTED');
-  camera.unregister(socket);
 }

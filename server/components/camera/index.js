@@ -10,7 +10,7 @@ var config   = require('../../config').camera;
 var fswebcam;
 var motion;
 
-var sockets      = {}
+var sendFrame
   , frameDir     = config.extra.target_dir
   , frameData
   , frameWatcher
@@ -20,10 +20,12 @@ var sockets      = {}
 var imageToWatch = path.join(frameDir, config.filename + '.jpg');
 
 var service = {
-  init      : init,
-  canStream : canStream,
-  register  : register,
-  unregister: unregister
+  init       : init,
+  canStream  : getCanStream,
+  isStreaming: getIsStreaming,
+  frame: getFrame,
+  start      : startStreaming,
+  stop       : stopStreaming
 };
 
 module.exports = service;
@@ -36,6 +38,7 @@ function init(callback) {
   log.log('Initializing camera module');
   fswebcam = require('./fswebcam')();
   motion = require('./motion')();
+  sendFrame = callback;
 
   fs.stat(config.extra.videodevice, function (err) {
     if (err) {
@@ -59,52 +62,17 @@ function init(callback) {
   }
 }
 
-function register(socket) {
-  if (!canStream) {
-    log.error('Not registering streaming, no video device present');
-    return;
-  }
-  sockets[socket.id] = socket;
-  socket.on('stream:start', function (id) {
-    startStreaming(sockets[id]);
-  });
-  socket.on('stream:pause', function (id) {
-    if (sockets.hasOwnProperty(id)) {
-      log.info('Socket [' + id + '] has paused streaming');
-      sockets[id].paused = true;
-    }
-  });
-}
+function getCanStream() { return canStream; }
 
-function unregister(socket) {
-  removeClient(socket.id);
-}
+function getIsStreaming() { return isStreaming; }
+
+function getFrame() { return frameData; }
 
 /**
  * Private Helpers
  */
 
-function removeClient(id) {
-  if (!id) {
-    return log.error('[remove] No socket id was supplied');
-  } else if (sockets.hasOwnProperty(id)) {
-    log.info('Removing client [' + id + ']');
-    delete sockets[id];
-    log.debug('Remaining clients [' + Object.keys(sockets).length + ']');
-    if (Object.keys(sockets).length === 0 && isStreaming) {
-      log.info('All clients gone, stopping streaming');
-      stopStreaming();
-    }
-  }
-}
-
-function startStreaming(socket) {
-  if (!socket) {
-    return log.error('[start] No socket was supplied');
-  } else if (isStreaming) {
-    log.info('[start] Already streaming, resuming last frame');
-    return socket.volatile.emit('frame', frameData);
-  }
+function startStreaming() {
   log.info('Initializing the frame capture')
   isStreaming = true;
   fswebcam.capture(onCapture);
@@ -113,10 +81,9 @@ function startStreaming(socket) {
     isStreaming = wasSuccess;
     if (wasSuccess) {
       readFrame(function (wasRead) {
-        log.info('Emitting initial frame');
-        socket.volatile.emit('frame:initial', frameData);
+        sendFrame('frame:initial', frameData);
       });
-      startMotionCapture(socket);
+      startMotionCapture();
     }
   }
 }
@@ -130,9 +97,9 @@ function stopStreaming() {
   }
 }
 
-function startMotionCapture(socket) {
+function startMotionCapture() {
   log.log('Starting motion capture process');
-  socket.emit('frame:loading');
+  sendFrame('frame:loading');
   motion.start(function (errorCode) {
     if (!errorCode) { return; }
     log.error('Motion encountered an error [' + errorCode + ']');
@@ -169,13 +136,7 @@ function startWatcher() {
   function onInterval() {
     readFrame(function (wasRead) {
       if (wasRead) {
-        // TODO maybe change it so io object is exposed instead of looping
-        // through each of the sockets
-        for (var id in sockets) {
-          if (sockets.hasOwnProperty(id)) {
-            sockets[id].volatile.emit('frame', frameData);
-          }
-        }
+        sendFrame('frame', frameData);
       }
     });
   }
