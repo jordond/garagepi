@@ -134,9 +134,9 @@ function startMotionCapture(socket) {
     if (!errorCode) { return; }
     log.error('Motion encountered an error [' + errorCode + ']');
     log.error('Stopping all camera activity');
-    stopWatcher(socket);
+    stopWatcher();
   });
-  startWatcher(socket);
+  startWatcher();
 }
 
 function readFrame(callback) {
@@ -153,7 +153,7 @@ function readFrame(callback) {
   });
 }
 
-function startWatcher(socket) {
+function startWatcher() {
   var fps = config.fps;
   if (fps > 30 || fps <= 0) {
     log.warn('FPS of [' + fps + '] not valid [1-30], defaulting to [24]');
@@ -165,8 +165,14 @@ function startWatcher(socket) {
 
   function onInterval() {
     readFrame(function (wasRead) {
-      if (wasRead && !socket.paused) {
-        socket.volatile.emit('frame', frameData);
+      if (wasRead) {
+        // TODO maybe change it so io object is exposed instead of looping
+        // through each of the sockets
+        for (var id in sockets) {
+          if (sockets.hasOwnProperty(id)) {
+            sockets[id].volatile.emit('frame', frameData);
+          }
+        }
       }
     });
   }

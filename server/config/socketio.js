@@ -50,7 +50,7 @@ function onConnect(socket) {
   // Find all of the api socket files and register them
   glob(config.api + '/**/*.socket.js', function (err, files) {
     if (err) { return log.error('Error finding socket files', err); }
-    log.info('[' + socket.id + '] Message: Registering [' + files.length + '] socket configs');
+    log.info('[' + socket.id + '] Registering [' + files.length + '] socket configs');
     files.forEach(function (file) {
       require(file).register(socket);
     });
