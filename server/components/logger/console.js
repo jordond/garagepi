@@ -26,8 +26,7 @@ Logger.prototype.debug = function (message, data) {
 
 Logger.prototype.info = function (message, data) {
   var bg = chalk.cyan;
-  var type = chalk.cyan;
-  this.toLog('info ', message, data, type, bg, bg);
+  this.toLog('info ', message, data, bg, bg, bg);
 };
 
 Logger.prototype.warn = function (message, data) {
