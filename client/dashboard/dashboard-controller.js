@@ -15,7 +15,7 @@
     .module('dashboard')
     .controller('DashboardCtrl', DashboardCtrl);
 
-  function DashboardCtrl($window, $scope, $http, Socket, Auth, Token, io) {
+  function DashboardCtrl($window, $scope, $http, Socket, Auth, Token) {
     var vm = this;
 
     vm.awesomeThings = [];
@@ -30,29 +30,25 @@
     };
 
     vm.start = function () {
-      // RESET TO USING WRAPPER
-      vm.socket = io.connect($window.location.origin + '/camera', {
-        query: 'token=' + Token.get(),
-        path: '/socket.io-client'
-      });
-      vm.socket.on('connect', function () {
-        console.log('connected');
-      });
-      vm.socket.on('frame', function (data) {
+      Socket.emit('camera:start', Socket.id);
+      Socket.on('camera:frame', function (data) {
         console.log('recieved frame');
         vm.frame = data;
       });
-      vm.socket.on('frame:initial', function (data) {
+      Socket.on('camera:initial', function (data) {
         console.log('recieved INITIAL frame');
         vm.frame = data;
       });
-      vm.socket.on('frame:loading', function () {
+      Socket.on('camera:loading', function () {
         console.log('LOADING FRAME');
       });
     };
+
     vm.stop = function () {
-      vm.socket.disconnect();
-      vm.socket = null;
+      Socket.emit('camera:stop', Socket.id);
+      Socket.remove('camera:frame');
+      Socket.remove('camera:initial');
+      Socket.remove('camera:loading');
     };
   }
 }());

@@ -53,7 +53,7 @@ Motion.prototype.start = function (callback) {
   this.process.on('exit', onExit);
 
   function onOutput(data) {
-    log.log('[Process] ' + data);
+    log.info('[Process] ' + data);
   }
 
   function onExit(code) {
@@ -66,7 +66,7 @@ Motion.prototype.start = function (callback) {
 };
 
 Motion.prototype.stop = function () {
-  log.info('Stopping motion capture process');
+  log.log('Stopping motion capture process');
   if (this.process) {
     this.process.kill();
     this.process = null;

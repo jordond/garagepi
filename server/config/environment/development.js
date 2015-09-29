@@ -13,5 +13,9 @@ module.exports = {
   // API WILL NOT REQUIRE AUTHENTICATION
   secureApi: false,
 
+  camera: {
+    shutdownDelay: 1
+  },
+
   seedDB: true
 };

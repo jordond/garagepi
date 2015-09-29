@@ -15,6 +15,7 @@ module.exports = {
     fps          : 24,
     allowedRotate: [90, 180, 270],
     filename     : 'frame',
+    shutdownDelay: 0,
     extra: {
       videodevice    : '/dev/video0',
       target_dir     : '/var/tmp/motion',

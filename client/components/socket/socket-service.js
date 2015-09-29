@@ -35,6 +35,7 @@
     self.unsyncUpdates = unsyncUpdates;
     self.emit          = emit;
     self.on            = registerEvent;
+    self.remove        = removeEvent;
     self.reset         = resetSocket;
     self.destroy       = destroy;
 
@@ -130,10 +131,18 @@
       }
     }
 
-    function registerEvent(event) {
+    function registerEvent(event, callback) {
       if (ready) {
         return ready.then(function () {
-          self.wrapper.on(event);
+          self.wrapper.on(event, callback);
+        });
+      }
+    }
+
+    function removeEvent(event) {
+      if (ready) {
+        return ready.then(function () {
+          self.wrapper.removeAllListeners(event);
         });
       }
     }

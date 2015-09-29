@@ -21,6 +21,10 @@ module.exports = {
 
   secureApi: true,
 
+  camera: {
+    shutdownDelay: 5
+  },
+
   token: {
     expiry: 158 * 60
   },

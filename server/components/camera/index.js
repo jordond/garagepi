@@ -81,7 +81,7 @@ function startStreaming() {
     isStreaming = wasSuccess;
     if (wasSuccess) {
       readFrame(function (wasRead) {
-        sendFrame('frame:initial', frameData);
+        sendFrame('camera:initial', frameData);
       });
       startMotionCapture();
     }
@@ -99,7 +99,7 @@ function stopStreaming() {
 
 function startMotionCapture() {
   log.log('Starting motion capture process');
-  sendFrame('frame:loading');
+  sendFrame('camera:loading');
   motion.start(function (errorCode) {
     if (!errorCode) { return; }
     log.error('Motion encountered an error [' + errorCode + ']');
@@ -136,7 +136,7 @@ function startWatcher() {
   function onInterval() {
     readFrame(function (wasRead) {
       if (wasRead) {
-        sendFrame('frame', frameData);
+        sendFrame('camera:frame', frameData);
       }
     });
   }

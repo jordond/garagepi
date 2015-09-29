@@ -1,10 +1,11 @@
 'use strict';
 
-var log = require('../logger/console')('Socket:Camera');
-var camera = require('../camera');
+var log             = require('../logger/console')('Socket:Camera');
+var config          = require('../../config').camera;
+var camera          = require('../camera');
 
 var io;
-var sockets = {};
+var sockets         = {};
 
 module.exports.init = init;
 
@@ -20,13 +21,17 @@ function onConnection(socket) {
   if (!camera.canStream()) {
     return log.error('Not registering streaming, no video device present');
   }
-  sockets[socket.id] = socket;
-  socket.on('start-stream', function () {
+  socket.on('camera:start', function () {
+    sockets[socket.id] = socket;
     if (!camera.isStreaming()) {
       camera.start();
     } else {
-      onSend('frame', camera.frame());
+      onSend('camera:frame', camera.frame());
     }
+  });
+
+  socket.on('camera:stop', function () {
+    onDisconnected(socket);
   });
 }
 
@@ -36,8 +41,12 @@ function onDisconnected(socket) {
     delete sockets[socket.id];
     log.debug('Remaining clients [' + Object.keys(sockets).length + ']');
     if (Object.keys(sockets).length === 0 && camera.isStreaming()) {
+      var delay = (config.shutdownDelay * 1000) * 60;
       log.info('All clients gone, stopping streaming');
-      camera.stop();
+      if (delay > 0) {
+        log.debug('Delaying stream shutdown by [' + config.shutdownDelay + ' minutes]');
+      }
+      setTimeout(camera.stop, delay);
     }
   }
 }
