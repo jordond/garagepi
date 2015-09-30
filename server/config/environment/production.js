@@ -17,7 +17,10 @@ module.exports = {
             'mongodb://localhost/garagepi'
   },
 
-  logLevel: 'INFO',
+  log: {
+    level: 'INFO',
+    short: true
+  },
 
   secureApi: true,
 
