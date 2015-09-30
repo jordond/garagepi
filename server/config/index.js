@@ -47,7 +47,7 @@ var all = {
 
   // Token settings, default expiry of 3 hours
   token: {
-    expiry: 3 * 60
+    expiry: 3
   },
 
   // MongoDB connection options
@@ -63,8 +63,8 @@ var all = {
 
 
 // Export the config object based on the NODE_ENV
-all = _.merge(all, require('./environment/' + process.env.NODE_ENV + '.js') || {});
 all = _.merge(all, require('./camera'));
+all = _.merge(all, require('./environment/' + process.env.NODE_ENV + '.js') || {});
 
 // Export the config object for local env
 // ==============================================

@@ -9,6 +9,8 @@ var glob = require('glob');
 var config = require('./index');
 var log = require('../components/logger/console')('Socket');
 
+var socketCount = 0;
+
 module.exports = function (socketio) {
   // In order to see all the debug output, set DEBUG (in server/config/local.env.js) to including the desired scope.
   // ex: DEBUG: "http*,socket.io:socket"
@@ -23,8 +25,10 @@ module.exports = function (socketio) {
     socket.connectedAt = new Date();
     socket.address = socket.handshake.address !== null ?
             socket.handshake.address : process.env.DOMAIN;
+    socketCount++;
 
     socket.on('disconnect', function () {
+      socketCount--;
       onDisconnect(socket);
     });
 
@@ -40,6 +44,7 @@ module.exports = function (socketio) {
 
 function onConnect(socket) {
   log.info('[' + socket.address + '] CONNECTED');
+  log.debug('[' + socketCount + '] Sockets connected');
 
   socket.on('info', function (data) {
     var message = '[' + socket.id + '] Message: ' + JSON.stringify(data, null, 2);
@@ -49,7 +54,7 @@ function onConnect(socket) {
   // Find all of the api socket files and register them
   glob(config.api + '/**/*.socket.js', function (err, files) {
     if (err) { return log.error('Error finding socket files', err); }
-    log.info('[' + socket.id + '] Registering [' + files.length + '] socket configs');
+    log.verbose('[' + socket.id + '] Registering [' + files.length + '] socket configs');
     files.forEach(function (file) {
       require(file).register(socket);
     });
@@ -58,4 +63,5 @@ function onConnect(socket) {
 
 function onDisconnect(socket) {
   log.info('[' + socket.address + '] DISCONNECTED');
+  log.debug('[' + socketCount + '] Sockets remaining');
 }

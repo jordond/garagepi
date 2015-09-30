@@ -16,37 +16,54 @@ var validateJwt = expressJwt({ secret: config.secrets.session });
  */
 function isAuthenticated() {
   return compose()
-    // Validate jwt
-    .use(function (req, res, next) {
-      // allow access_token to be passed through query parameter as well
-      if(req.query && req.query.hasOwnProperty('access_token')) {
-        req.headers.authorization = 'Bearer ' + req.query.access_token;
-      }
-      validateJwt(req, res, next);
-    })
-    // Handle the validation errors
-    .use(function (err, req, res, next) {
-      if (err) {
-        return res.status(err.status).json(err);
-      } else {
-        next();
-      }
-    })
-    // Attach user to request
-    .use(function (req, res, next) {
-      User.findById(req.user._id, function (err, user) {
-        var userToken;
-        if (err) return next(err);
-        if (!user) return res.sendStatus(401);
+    .use(validate)
+    .use(handleError)
+    .use(attachUser);
 
-        userToken = getToken(req.headers.authorization);
-        if (user.tokens.indexOf(userToken) > -1) {
-          req.user = user;
-          next();
-        } else {
-          return res.status(401).json({message: 'Access token is invalid or has been revoked.'})
-        }
-      });
+  function validate(req, res, next) {
+    // allow access_token to be passed through query parameter as well
+    if(req.query && req.query.hasOwnProperty('access_token')) {
+      req.headers.authorization = 'Bearer ' + req.query.access_token;
+    }
+    validateJwt(req, res, next);
+  }
+
+  function handleError(err, req, res, next) {
+    if (err) {
+      return res.status(err.status).json(err);
+    } else {
+      next();
+    }
+  }
+
+  function attachUser(req, res, next) {
+    User.findById(req.user._id, function (err, user) {
+      var userToken;
+      if (err) return next(err);
+      if (!user) return res.sendStatus(404);
+
+      userToken = getToken(req.headers.authorization);
+      if (user.tokens.indexOf(userToken) > -1 || !config.secureApi) {
+        req.user = user;
+        next();
+      } else {
+        return res.status(403).json({message: 'Access token is invalid or has been revoked.'})
+      }
+    });
+  }
+}
+
+function attachId(req, res, next) {
+  return compose()
+    .use(function (req, res, next) {
+      var token, decoded, userId;
+      token = getToken(req.headers.authorization);
+      decoded = jwt.decode(token);
+      userId = decoded ? decoded._id : false;
+      if (userId) {
+        req.user = {_id: userId};
+      }
+      next();
     });
 }
 
@@ -157,7 +174,7 @@ function hasRole(roleRequired) {
 
   return compose()
     .use(function meetsRequirements(req, res, next) {
-      if (!config.secureApi) {return next();}
+      if (!config.secureApi) { return next(); }
       if (!req.user) {return res.status(404);}
 
       if (config.userRoles.indexOf(req.user.role) >= config.userRoles.indexOf(roleRequired)) {
@@ -175,6 +192,7 @@ function hasRole(roleRequired) {
 function isMeOrHasRole(roleRequired) {
   return compose()
     .use(function checkIsMe(req, res, next) {
+      if (!config.secureApi) { return next(); }
       var userId = req.params.id;
       if (req.user.id) {
         if (req.user.id === userId) {
@@ -225,9 +243,13 @@ function getToken(header) {
 function removeStaleTokens(tokens) {
   var validTokens = [];
   for (var i = 0; i < tokens.length; i++) {
-    var decoded = jwt.verify(tokens[i], config.secrets.session);
-    if (decoded) {
-      validTokens.push(tokens[i]);
+    try {
+      var decoded = jwt.verify(tokens[i], config.secrets.session);
+      if (decoded) {
+        validTokens.push(tokens[i]);
+      }
+    } catch (err) {
+      continue;
     }
   }
   return validTokens;
@@ -237,7 +259,7 @@ function removeStaleTokens(tokens) {
  * Returns a jwt token signed by the app secret
  */
 function signToken(id) {
-  return jwt.sign({ _id: id }, config.secrets.session, { expiresInMinutes: config.token.expiry });
+  return jwt.sign({ _id: id }, config.secrets.session, { expiresInMinutes: config.token.expiry * 60 });
 }
 
 /**
@@ -251,6 +273,7 @@ function setTokenCookie(req, res) {
 }
 
 exports.isAuthenticated = isAuthenticated;
+exports.attachId        = attachId;
 exports.isValidToken    = isValidToken;
 exports.refreshToken    = refreshToken;
 exports.revokeToken     = revokeToken;

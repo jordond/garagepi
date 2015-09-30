@@ -9,7 +9,7 @@ module.exports = {
 
   // Server port
   port:     process.env.PORT ||
-            5679,
+            80,
 
   // MongoDB connection options
   mongo: {
@@ -26,7 +26,7 @@ module.exports = {
   },
 
   token: {
-    expiry: 158 * 60
+    expiry: 158
   },
 
   seedDB: true

@@ -10,7 +10,7 @@ var path = require('path');
 
 module.exports = {
   camera: {
-    configPath   : path.normalize(__dirname + '/../components/camera/motion.conf'),
+    configPath   : '/var/tmp/motion.conf',
     logPath      : path.normalize('/tmp'),
     fps          : 24,
     allowedRotate: [90, 180, 270],

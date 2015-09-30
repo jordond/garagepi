@@ -33,6 +33,7 @@
       Socket.emit('camera:start', Socket.id);
       Socket.on('camera:frame', function (data) {
         console.log('recieved frame');
+        vm.frameOld = vm.frame;
         vm.frame = data;
       });
       Socket.on('camera:initial', function (data) {

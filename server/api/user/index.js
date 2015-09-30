@@ -9,7 +9,11 @@ var router = express.Router();
 
 router.get('/', auth.hasRole('admin'), controller.index);
 router.delete('/:id', auth.hasRole('admin'), controller.destroy);
-router.get('/me', controller.me);
+if (config.secureApi) {
+  router.get('/me', controller.me);
+} else {
+  router.get('/me', auth.attachId(), controller.me);
+}
 router.get('/roles', controller.roles);
 router.post('/', auth.hasRole('admin'), controller.create);
 router.get('/:id', auth.hasRole('admin'), controller.show);

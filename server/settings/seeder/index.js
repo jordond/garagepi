@@ -35,7 +35,7 @@ exports.seeder = function (finished) {
   files.splice(files.indexOf('sample.seed.js'), 1);
 
   var mode = config.seedDB === 'override' ? config.seedDB : 'normal';
-  log.info('Starting Seeder in [' + mode + '] mode');
+  log.log('Starting Seeder in [' + mode + '] mode');
   log.info('Found [' + files.length + '] Seeds');
 
   files.forEach(function (file) {
@@ -63,7 +63,7 @@ exports.seeder = function (finished) {
     }
     count++;
     if (count === files.length) {
-      log.info('Finished seeding database [' + count + '] seeds');
+      log.log('Finished seeding database [' + count + '] seeds');
       finished();
     }
   }
