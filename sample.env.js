@@ -68,9 +68,10 @@ module.exports = {
 
   /**
    * Token settings, default expiry of 3 hours in minutes
+   * In hours
    */
   // token: {
-  //   expiry: 3 * 60
+  //   expiry: 3
   // },
 
   /**

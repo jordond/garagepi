@@ -19,6 +19,7 @@ module.exports = {
   serverDir: 'server',
 
   // build directories
+  buildRoot: outDir,
   buildDir: outDir + 'client/',
   buildCss: outDir + 'client/css/',
   buildFonts: outDir + 'client/fonts/',
@@ -31,5 +32,13 @@ module.exports = {
   extJs: outDir + 'client/vendor/js/',
 
   // server build directories
-  serverBuildDir: outDir + 'server/'
+  serverBuildDir: outDir + 'server/',
+
+  // deploy options
+  root: 'garage-pi',
+  hostname: 'merlin',
+  username: 'pi',
+  port: 22,
+  destination: '/opt/garagepi',
+  clean: false
 };

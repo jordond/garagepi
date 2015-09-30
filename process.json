@@ -1,0 +1,14 @@
+{
+  "name": "garagepi",
+  "script": "server/app.js",
+  "cwd": "/opt/garagepi",
+  "out_file": "/opt/garagepi/logs/garagepi.log",
+  "error_file": "/opt/garagepi/logs/garagepi.error.log",
+  "args": [],
+  "watch": true,
+  "node_args": [],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "ignore_watch": ["node_modules", "bower_components", "motion.conf"]
+}
