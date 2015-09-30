@@ -5,10 +5,10 @@
   "out_file": "/opt/garagepi/logs/garagepi.log",
   "error_file": "/opt/garagepi/logs/garagepi.error.log",
   "args": [],
-  "watch": true,
   "node_args": [],
   "env": {
     "NODE_ENV": "production"
   },
+  "watch": ["server", "env.js"],
   "ignore_watch": ["node_modules", "bower_components", "motion.conf"]
 }

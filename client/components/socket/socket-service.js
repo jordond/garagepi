@@ -158,6 +158,7 @@
       if (isConnected()) {
         unsyncAll()
           .then(function () {
+            self.wrapper.emit('info', 'Refreshing user token');
             self.wrapper.disconnect();
             connect().then(syncAll);
           });

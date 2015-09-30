@@ -43,7 +43,7 @@ module.exports = function (socketio) {
  */
 
 function onConnect(socket) {
-  log.info('[' + socket.address + '] CONNECTED');
+  log.info('[' + socket.address + '][' + socket.id + '] Connected');
   log.debug('[' + socketCount + '] Sockets connected');
 
   socket.on('info', function (data) {
@@ -62,6 +62,6 @@ function onConnect(socket) {
 }
 
 function onDisconnect(socket) {
-  log.info('[' + socket.address + '] DISCONNECTED');
-  log.debug('[' + socketCount + '] Sockets remaining');
+  log.info('[' + socket.address + '][' + socket.id + '] Disconnected');
+  log.verbose('[' + socketCount + '] Sockets remaining');
 }
