@@ -11,7 +11,7 @@
    *
    */
   angular
-    .module('account')
+    .module('app.account')
     .directive('logout', logout);
 
   function logout() {

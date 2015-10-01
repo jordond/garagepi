@@ -36,16 +36,18 @@ module.exports = service;
 
 function init(callback) {
   log.log('Initializing camera module');
-  fswebcam = require('./fswebcam')();
-  motion = require('./motion')();
   sendFrame = callback;
 
   fs.stat(config.extra.videodevice, function (err) {
     if (err) {
       log.error('Video device [' + config.extra.videodevice + '] not found')
+      log.error('Skipping camera setup, add device and restart');
       canStream = false;
+    } else {
+      fswebcam = require('./fswebcam')();
+      motion = require('./motion')();
+      fs.stat(frameDir, onDirStat);
     }
-    fs.stat(frameDir, onDirStat);
   });
 
   process
@@ -73,6 +75,7 @@ function getFrame() { return frameData; }
  */
 
 function startStreaming() {
+  if (!canStream) { return; }
   log.info('Initializing the frame capture')
   isStreaming = true;
   fswebcam.capture(onCapture);

@@ -18,10 +18,11 @@ function init(socketio) {
 }
 
 function onConnection(socket) {
-  if (!camera.canStream()) {
-    return log.error('Not registering streaming, no video device present');
-  }
   socket.on('camera:start', function () {
+    if (!camera.canStream()) {
+      onError(socket, 'Server error', 'Video device was not found', {device: config.extra.videodevice});
+      return log.error('Not registering streaming, no video device present');
+    }
     sockets[socket.id] = socket;
     if (!camera.isStreaming()) {
       camera.start();
@@ -56,4 +57,12 @@ function onSend(event, data) {
     return log.error('No event was supplied');
   }
   io.emit(event, data);
+}
+
+function onError(socket, title, message, info) {
+  socket.emit('server:error', {
+    title: title,
+    message: message,
+    info: info
+  });
 }

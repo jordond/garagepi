@@ -9,7 +9,7 @@
    *
    */
   angular
-    .module('account')
+    .module('app.account')
     .controller('UserSettingsCtrl', UserSettingsCtrl);
 
   UserSettingsCtrl.$injector = ['profilePrepService'];

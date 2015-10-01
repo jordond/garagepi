@@ -9,7 +9,7 @@
    *
    */
   angular
-    .module('account')
+    .module('app.account')
     .controller('LogoutCtrl', LogoutCtrl);
 
   function LogoutCtrl($state, Auth) {

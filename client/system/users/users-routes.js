@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('system.users')
+    .module('app.system.users')
     .config(config);
 
   function config($stateProvider) {

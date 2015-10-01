@@ -12,7 +12,7 @@
    *
    */
   angular
-    .module('dashboard')
+    .module('app.dashboard')
     .controller('DashboardCtrl', DashboardCtrl);
 
   function DashboardCtrl($window, $scope, $http, Socket, Auth, Token) {

@@ -19,9 +19,9 @@
       'toastr',
       'jutaz.ngSweetAlertAsPromised',
       'components',
-      'dashboard',
-      'account',
-      'system'
+      'app.dashboard',
+      'app.account',
+      'app.system'
     ]);
 
   angular

@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('dashboard')
+    .module('app.dashboard')
     .config(config);
 
   function config($stateProvider) {

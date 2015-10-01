@@ -246,6 +246,12 @@
       socket.on('reconnect_failed', function (error) {
         logger.error('Failed to reconnect to server, try logging in', error, 'SocketIO');
       });
+      socket.on('server:error', function (data) {
+        logger.error(data.message, data.info, data.title);
+      });
+      socket.on('server:warning', function (data) {
+        logger.warning(data.message, data.info, data.title || 'Server Error');
+      });
     }
 
     /**

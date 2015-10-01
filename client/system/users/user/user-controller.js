@@ -9,7 +9,7 @@
    *
    */
   angular
-    .module('system')
+    .module('app.system.users')
     .controller('UserCtrl', UserCtrl);
 
   UserCtrl.$inject = ['$state', 'userPrepService'];
