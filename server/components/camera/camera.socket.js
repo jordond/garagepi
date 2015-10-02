@@ -6,23 +6,38 @@ var camera          = require('../camera');
 
 var io;
 var sockets         = {};
+var timeout;
 
 module.exports.init = init;
+module.exports.disconnect = onDisconnected;
 
 function init(socketio) {
   io = socketio;
   io.on('connection', onConnection);
-  io.on('disconnect', onDisconnected);
+  //io.on('disconnect', onDisconnected);
   camera.init(onSend);
   log.info('Initialization completed');
 }
 
 function onConnection(socket) {
+  socket.on('camera:info', function (data, callback) {
+    if (!camera.canStream()) {
+      return callback({ready: false, message: 'Device not found'});
+    }
+    callback({
+      ready: true,
+      isStreaming: camera.isStreaming(),
+      message: 'Ready to stream',
+      config: config
+    });
+  });
+
   socket.on('camera:start', function () {
     if (!camera.canStream()) {
       onError(socket, 'Server error', 'Video device was not found', {device: config.extra.videodevice});
       return log.error('Not registering streaming, no video device present');
     }
+    clearTimeout(timeout);
     sockets[socket.id] = socket;
     if (!camera.isStreaming()) {
       camera.start();
@@ -47,7 +62,7 @@ function onDisconnected(socket) {
       if (delay > 0) {
         log.debug('Delaying stream shutdown by [' + config.shutdownDelay + ' minutes]');
       }
-      setTimeout(camera.stop, delay);
+      timeout = setTimeout(camera.stop, delay);
     }
   }
 }

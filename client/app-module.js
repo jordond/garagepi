@@ -21,7 +21,8 @@
       'components',
       'app.dashboard',
       'app.account',
-      'app.system'
+      'app.system',
+      'app.ui'
     ]);
 
   angular

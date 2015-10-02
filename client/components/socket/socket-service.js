@@ -119,14 +119,16 @@
 
     /**
      * Emit data to the socket
-     * @param  {String} event Name of the event
-     * @param  {Object} data  info in call
-     * @return {promise}      Status of emit
+     * @param  {String}   event    Name of the event
+     * @param  {Object}   data     info in call
+     * @param  {Function} callback on complete
+     * @return {promise}  Status of emit
      */
-    function emit(event, data) {
+    function emit(event, data, callback) {
       if (isConnected) {
         return ready.then(function () {
-          self.wrapper.emit(event, data);
+          logger.log(TAG, 'Emitting event: ' + event);
+          self.wrapper.emit(event, data, callback);
         });
       }
     }

@@ -18,6 +18,7 @@ function FSWebcam(filename) {
   this.arguments = [
     '-q',
     '-d', config.extra.videodevice,
+    '-r', config.extra.width + 'x' + config.extra.height,
     '--no-banner'
   ];
 

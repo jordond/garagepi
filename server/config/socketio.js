@@ -8,6 +8,7 @@ var glob = require('glob');
 
 var config = require('./index');
 var log = require('../components/logger/console')('Socket');
+var camera = require('../components/camera/camera.socket');
 
 var socketCount = 0;
 
@@ -35,7 +36,7 @@ module.exports = function (socketio) {
     onConnect(socket);
   });
 
-  require('../components/camera/camera.socket').init(socketio);
+  camera.init(socketio);
 };
 
 /**
@@ -64,4 +65,5 @@ function onConnect(socket) {
 function onDisconnect(socket) {
   log.info('[' + socket.address + '][' + socket.id + '] Disconnected');
   log.verbose('[' + socketCount + '] Sockets remaining');
+  camera.disconnect(socket);
 }

@@ -1,0 +1,23 @@
+<div class="controls-container">
+  <div class="controls-play">
+    <div class="btn btn-default" ng-click="play()">
+      <i class="fa fa-play" ng-show="!vm.playing"></i>
+      <i class="fa fa-pause" ng-show="vm.playing"></i>
+    </div>
+  </div>
+  <div class="controls-stop">
+    <div class="btn btn-default" ng-click="stop()">
+      <i class="fa fa stop"></i>
+    </div>
+  </div>
+  <div class="controls-reset">
+    <div class="btn btn-default" ng-click="reset()">
+      <i class="fa fa-repeat"></i>
+    </div>
+  </div>
+  <div class="controls-info">
+    <div class="btn btn-default" ng-click="info()">
+      <i class="fa fa-info-circle"></i>
+    </div>
+  </div>
+</div>

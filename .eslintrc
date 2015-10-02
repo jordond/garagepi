@@ -192,7 +192,7 @@
     "spaced-line-comment": [2, "always"],
     "strict": "global",
     "use-isnan": [2, true],
-    "valid-jsdoc": [2, {
+    "valid-jsdoc": [0, {
       "requireParamDescription": true,
       "requireReturn": false,
       "requireReturnDescription": true
