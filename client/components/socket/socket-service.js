@@ -141,10 +141,14 @@
       }
     }
 
-    function removeEvent(event) {
+    function removeEvent(event, fn) {
       if (ready) {
         return ready.then(function () {
-          self.wrapper.removeAllListeners(event);
+          if (fn) {
+            self.wrapper.removeListener(event, fn);
+          } else {
+            self.wrapper.removeAllListeners(event);
+          }
         });
       }
     }
@@ -224,10 +228,11 @@
       socket.on('connect', function () {
         self.wrapper.socket(socket);
         self.id = socket.id;
-        registerSocketEvents(socket);
         log('Connected');
         deferred.resolve();
       });
+      registerSocketEvents(socket);
+
       return deferred.promise;
     }
 

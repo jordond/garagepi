@@ -22,7 +22,7 @@ function init(socketio) {
 function onConnection(socket) {
   socket.on('camera:info', function (data, callback) {
     if (!camera.canStream()) {
-      return callback({ready: false, message: 'Device not found'});
+      return callback({ready: false, error: 'Device not found'});
     }
     callback({
       ready: true,
@@ -37,11 +37,18 @@ function onConnection(socket) {
       onError(socket, 'Server error', 'Video device was not found', {device: config.extra.videodevice});
       return log.error('Not registering streaming, no video device present');
     }
-    clearTimeout(timeout);
+    log.debug('Recieved \'camera:start\' event');
+    if (timeout) {
+      log.info('Client connected, canceling motion shutdown');
+      clearTimeout(timeout);
+    }
+    log.debug('[' + socket.id + '] Added to stream');
     sockets[socket.id] = socket;
     if (!camera.isStreaming()) {
+      log.info('[' + socket.id + '] Starting camera feed');
       camera.start();
     } else {
+      log.info('[' + socket.id + '] Capture in progress, sending frame');
       onSend('camera:frame', camera.frame());
     }
   });
@@ -60,9 +67,12 @@ function onDisconnected(socket) {
       var delay = (config.shutdownDelay * 1000) * 60;
       log.info('All clients gone, stopping streaming');
       if (delay > 0) {
-        log.debug('Delaying stream shutdown by [' + config.shutdownDelay + ' minutes]');
+        log.info('Delaying stream shutdown by [' + config.shutdownDelay + ' minutes]');
       }
-      timeout = setTimeout(camera.stop, delay);
+      timeout = setTimeout(function () {
+        camera.stop();
+        timeout = null;
+      }, delay);
     }
   }
 }

@@ -15,6 +15,9 @@
            error="vm.feed.frame.prev">
     </div>
     <div class="camera-image-loading" ng-show="vm.feed.loading">Loading</div>
+    <div class="camera-image-error" ng-show="vm.feed.error.hasError">
+      Error: <span>{{ vm.feed.error.message }}</span>
+    </div>
   </div>
   <div class="camera-controls col-md-6">
     <div camera-controls></div>
