@@ -26,7 +26,7 @@ function onConnection(socket) {
     }
     callback({
       ready: true,
-      isStreaming: camera.isStreaming(),
+      isCapturing: camera.isStreaming(),
       message: 'Ready to stream',
       config: config
     });

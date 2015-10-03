@@ -1,26 +1,22 @@
 <div class="camera-container">
   <div class="camera-active">
-    <div class="camera-active-yes" ng-show="vm.feed.active">
+    <div class="camera-active-yes" ng-show="vm.feed.motion">
       Active <i class="fa fa-circle"></i>
     </div>
-    <div class="camera-active-no" ng-show="!vm.feed.active">
+    <div class="camera-active-no" ng-show="!vm.feed.motion">
       Inactive <i class="fa fa-circle-o"></i>
     </div>
   </div>
   <div class="camera-image">
     <div class="camera-image-feed">
-      <img alt="Video Feed"
+      <img alt="Video Feed" class="img-responsive"
            ng-src="{{ vm.feed.frame.src }}"
            img-error
            error="vm.feed.frame.prev">
     </div>
     <div class="camera-image-loading" ng-show="vm.feed.loading">Loading</div>
   </div>
-  <div class="camera-controls">
-    <div camera-controls
-         play="vm.fnPlay()"
-         stop="vm.fnStop()"
-         info="vm.fnInfo()">
-    </div>
+  <div class="camera-controls col-md-6">
+    <div camera-controls></div>
   </div>
 </div>

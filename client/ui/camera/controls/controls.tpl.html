@@ -1,22 +1,22 @@
-<div class="controls-container">
-  <div class="controls-play">
-    <div class="btn btn-default" ng-click="play()">
-      <i class="fa fa-play" ng-show="!vm.playing"></i>
-      <i class="fa fa-pause" ng-show="vm.playing"></i>
+<div class="controls-container col-md-12">
+  <div class="controls-toggle col-md-2">
+    <div class="btn btn-default" ng-click="vm.feed.toggle()">
+      <i class="fa fa-play" ng-show="!vm.feed.data.streaming"></i>
+      <i class="fa fa-pause" ng-show="vm.feed.data.streaming"></i>
     </div>
   </div>
-  <div class="controls-stop">
-    <div class="btn btn-default" ng-click="stop()">
-      <i class="fa fa stop"></i>
+  <div class="controls-stop col-md-2">
+    <div class="btn btn-default" ng-click="vm.feed.stop()">
+      <i class="fa fa-stop"></i>
     </div>
   </div>
-  <div class="controls-reset">
-    <div class="btn btn-default" ng-click="reset()">
+  <div class="controls-reset col-md-2 col-md-offset-4">
+    <div class="btn btn-default" ng-click="vm.feed.reset()">
       <i class="fa fa-repeat"></i>
     </div>
   </div>
-  <div class="controls-info">
-    <div class="btn btn-default" ng-click="info()">
+  <div class="controls-info col-md-2">
+    <div class="btn btn-default" ng-click="vm.info()">
       <i class="fa fa-info-circle"></i>
     </div>
   </div>

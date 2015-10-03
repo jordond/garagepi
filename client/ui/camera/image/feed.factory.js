@@ -16,25 +16,24 @@
   function FeedConfig($q, $interval, Socket, logger) {
     var TAG = 'Feed'
       , service
-      , info = {}
-      , streaming
-      , loading
-      , activeTimer
-      , active
-      , frame = {};
+      , data
+      , motionTimer;
+
+    data = {
+      started: false,
+      info: {},
+      streaming: false,
+      loading: false,
+      motion: false,
+      frame: {}
+    };
 
     service = {
-      activate   : activate,
-      play       : play,
-      stop       : stop,
-      reset      : reset,
-
-      // Variables
-      isStreaming: streaming,
-      info       : info,
-      loading    : loading,
-      active     : active,
-      frame      : frame
+      activate: activate,
+      toggle  : toggle,
+      stop    : stop,
+      reset   : reset,
+      data    : data
     };
 
     return service;
@@ -45,14 +44,13 @@
 
     function activate(autostart) {
       return getInfo()
-        .then(function () {
+        .then(function (info) {
+          data.info = info;
           if (info.ready) {
-            if (!info.isStreaming && autostart) {
-              Socket.emit('camera:start');
-              streaming = true;
+            if (!info.isCapturing && !autostart) {
+              start();
             }
             registerEvents();
-            activeTimer = $interval(checkActive, 3000);
           } else {
             // display error or do nothing
             logger.log(TAG, 'TODO implment camera feed not available');
@@ -60,25 +58,27 @@
         });
     }
 
-    function play() {
-      if (streaming) {
+    function toggle() {
+      if (!data.started) {
+        start();
+      } else if (data.streaming) {
         logger.log(TAG, 'Pausing the camera feed');
         unregisterEvents();
-        streaming = false;
+        data.streaming = false;
       } else {
         logger.log(TAG, 'Resuming the camera feed');
         registerEvents();
-        streaming = false;
+        data.streaming = true;
       }
     }
 
     function stop() {
       Socket.emit('camera:stop');
-      streaming = false;
-      if (angular.isDefined(activeTimer)) {
+      data.streaming = false;
+      if (angular.isDefined(motionTimer)) {
         logger.log(TAG, 'Stopping motion active checker');
-        $interval.cancel(activeTimer);
-        activeTimer = undefined;
+        $interval.cancel(motionTimer);
+        motionTimer = undefined;
       }
     }
 
@@ -93,27 +93,35 @@
 
     function getInfo() {
       var q = $q.defer();
-      Socket.emit('camera:info', null, function (data) {
+      Socket.emit('camera:info', null, function (info) {
         logger.log(TAG, 'Recieved camera information from the server');
-        info = data;
-        q.resolve();
+        q.resolve(info);
       });
       return q.promise;
     }
 
+    function start() {
+      Socket.emit('camera:start');
+      motionTimer = $interval(checkMotion, 3000);
+      data.streaming = true;
+      data.started = true;
+    }
+
     function registerEvents() {
+      logger.log(TAG, 'Registering camera events');
       Socket.on('camera:loading', function () {
         logger.log(TAG, 'Camera feed is loading');
-        loading = true;
+        data.loading = true;
       });
       Socket.on('camera:initial', function () {
         logger.log(TAG, 'Recieved initial frame');
-        loading = true;
+        data.loading = true;
       });
-      Socket.on('camera:frame', function (data) {
-        frame.timestamp = Date.now();
-        frame.prev = frame.src;
-        frame.src = 'data:image/jpeg;base64, ' + data;
+      Socket.on('camera:frame', function (frame) {
+        data.loading = false;
+        data.frame.timestamp = Date.now();
+        data.frame.prev = data.frame.src;
+        data.frame.src = 'data:image/jpeg;base64, ' + frame;
       });
     }
 
@@ -123,13 +131,13 @@
       Socket.remove('camera:loading');
     }
 
-    function checkActive() {
-      var last = new Date(frame.timestamp)
+    function checkMotion() {
+      var last = new Date(data.frame.timestamp)
         , diff = (new Date() - last) / 1000;
-      if (Math.ceil(diff) > 3) {
-        active = false;
+      if (Math.ceil(diff) > 3 || isNaN(diff)) {
+        data.motion = false;
       } else {
-        active = false;
+        data.motion = true;
       }
     }
   }

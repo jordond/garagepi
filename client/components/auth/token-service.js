@@ -112,12 +112,13 @@
       logger.log(TAG, 'Starting token refresher');
       refresher = $interval(refreshToken, delay);
 
-      if (refreshNow) {
-        timeout = $timeout(function () {
-          refreshToken();
-          timeout = undefined;
-        }, 60 * 1000);
-      }
+      // TO DO - renable refresher
+      // if (refreshNow) {
+      //   timeout = $timeout(function () {
+      //     refreshToken();
+      //     timeout = undefined;
+      //   }, 60 * 1000);
+      // }
     }
 
     /**

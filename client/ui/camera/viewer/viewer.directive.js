@@ -40,7 +40,7 @@
 
       function onActivated() {
         logger.log('Viewer', 'Feed services has been activated');
-        vm.feed = Feed;
+        vm.feed = Feed.data;
       }
 
       vm.fnPlay = play;
@@ -49,6 +49,7 @@
 
       function play() {
         console.log('Inside play');
+        Feed.toggle();
       }
 
       function stop() {
