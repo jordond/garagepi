@@ -17,6 +17,7 @@
     var TAG = 'Feed'
       , service
       , data
+      , disconnected
       , reconnectTimeout
       , motionTimer;
 
@@ -34,16 +35,46 @@
     };
 
     service = {
-      activate: activate,
-      toggle  : toggle,
-      stop    : stop,
-      data    : data
+      init   : init,
+      toggle : toggle,
+      destroy: destroy,
+      data   : data
     };
 
     return service;
 
     /**
      * Public Methods
+     */
+
+    function init(autostart) {
+      Socket.onRefresh('connect', onConnect);
+      Socket.on('disconnect', onDisconnect);
+      return activate(autostart);
+    }
+
+    function toggle() {
+      if (!data.started) {
+        start();
+      } else if (data.streaming) {
+        logger.log(TAG, 'Pausing the camera feed');
+        data.streaming = false;
+      } else {
+        logger.log(TAG, 'Resuming the camera feed');
+        data.streaming = true;
+      }
+    }
+
+    function destroy() {
+      stop();
+      resetData();
+      if (reconnectTimeout) {
+        reconnectTimeout.cancel();
+      }
+    }
+
+    /**
+     * Private functions
      */
 
     function activate(autostart) {
@@ -62,26 +93,24 @@
         })
         .catch(function (err) {
           logger.log(TAG, 'Activate failed: ' + err);
+          return $q.reject(err);
         });
     }
 
-    function toggle() {
-      if (!data.started) {
-        start();
-      } else if (data.streaming) {
-        logger.log(TAG, 'Pausing the camera feed');
-        unregisterEvents();
-        data.streaming = false;
-      } else {
-        logger.log(TAG, 'Resuming the camera feed');
-        registerEvents();
-        data.streaming = true;
-      }
+    function start() {
+      registerEvents();
+      Socket.emit('camera:start');
+      motionTimer = $interval(checkMotion, 3000);
+      data.streaming = true;
+      data.started = true;
+      data.error.hasError = false;
     }
 
     function stop() {
       if (data.started) {
+        unregisterEvents();
         Socket.emit('camera:stop');
+        resetData();
         if (angular.isDefined(motionTimer)) {
           logger.log(TAG, 'Stopping motion active checker');
           $interval.cancel(motionTimer);
@@ -100,9 +129,32 @@
       data.error.hasError = false;
     }
 
-    /**
-     * Private functions
-     */
+    function onDisconnect() {
+      disconnected = true;
+      stop();
+      resetData();
+      data.error = {
+        hasError: true,
+        message: 'Connection to server has been lost'
+      };
+      if (reconnectTimeout) {
+        reconnectTimeout.cancel();
+      }
+    }
+
+    function onConnect() {
+      if (!reconnectTimeout && disconnected) {
+        reconnectTimeout = $timeout(run, 2000);
+        disconnected = false;
+      }
+
+      function run() {
+        logger.log(TAG, 'Attempting to reactivate camera feed');
+        reconnectTimeout = null;
+        resetData();
+        start();
+      }
+    }
 
     function getInfo() {
       var q = $q.defer();
@@ -113,75 +165,42 @@
       return q.promise;
     }
 
-    function start() {
-      registerEvents();
-      Socket.emit('camera:start');
-      motionTimer = $interval(checkMotion, 3000);
-      data.streaming = true;
-      data.started = true;
-    }
-
     function registerEvents() {
       logger.log(TAG, 'Registering camera events');
-      Socket.on('disconnect', onDisconnect);
-      Socket.on('reconnect', onReconnect);
-
       Socket.on('camera:loading', function () {
+        if (!data.streaming) { return; }
         logger.log(TAG, 'Camera feed is loading');
         data.loading = true;
       });
       Socket.on('camera:initial', function (frame) {
+        if (!data.streaming) { return; }
         logger.log(TAG, 'Recieved initial frame');
         data.frame = {
           timestamp: Date.now(),
           src: 'data:image/jpeg;base64, ' + frame,
           prev: 'data:image/jpeg;base64, ' + frame
-        }
+        };
         $timeout(function () {
           data.loading = false;
         }, 30 * 1000);
       });
       Socket.on('camera:frame', function (frame) {
+        if (!data.streaming) { return; }
+        var prev = data.frame.src;
         data.loading = false;
         data.motion = true;
         data.frame = {
           timestamp: Date.now(),
-          src: 'data:image/jpeg;base64, ' + frame
+          src: 'data:image/jpeg;base64, ' + frame,
+          prev: prev
         };
-        data.frame.prev = data.frame.src;
       });
-
-      function onDisconnect() {
-        resetData();
-        data.error = {
-          hasError: true,
-          message: 'Connection to server has been lost'
-        };
-        reconnectTimeout = null;
-        stop();
-        unregisterEvents();
-        Socket.remove('disconnect', onDisconnect);
-      }
-
-      function onReconnect() {
-        if (!reconnectTimeout) {
-          reconnectTimeout = $timeout(reconnect, 2000);
-          Socket.remove('reconnect', onReconnect);
-        }
-      }
-    }
-
-    function reconnect() {
-      logger.log(TAG, 'Attempting to reactivate camera feed');
-      reconnectTimeout = null;
-      resetData();
-      activate(true);
     }
 
     function unregisterEvents() {
-      Socket.remove('camera:frame');
-      Socket.remove('camera:initial');
       Socket.remove('camera:loading');
+      Socket.remove('camera:initial');
+      Socket.remove('camera:frame');
     }
 
     function checkMotion() {

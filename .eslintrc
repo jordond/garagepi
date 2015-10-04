@@ -38,7 +38,7 @@
     "angular/ng_typecheck_string": [2, true],
     "angular/ng_window_service": [2, true],
     "block-scoped-var": [2, true],
-    "brace-style": [2, "1tbs", {"allowSingleLine": false}],
+    "brace-style": [2, "1tbs", {"allowSingleLine": true}],
     "camelcase": [2, true],
     "comma-dangle": [2, "never"],
     "comma-spacing": [2, {

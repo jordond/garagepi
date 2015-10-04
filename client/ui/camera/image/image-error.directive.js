@@ -36,7 +36,10 @@
       element.on('error', onError);
 
       function onError() {
-        var src = scope.error || scope.default;
+        var src = scope.error;
+        if (src === 'data:image/jpeg;base64, ') {
+          src = scope.default;
+        }
         if (element[0].src !== src) {
           element[0].src = src;
         }

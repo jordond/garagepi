@@ -145,7 +145,12 @@ angular.module('btford.socket-io', []).
         };
 
         var connected = function () {
-          return socket || socket.connected;
+          if (socket) {
+            if (socket.connected) {
+              return true;
+            }
+          }
+          return false;
         };
 
         return {

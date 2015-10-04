@@ -22,6 +22,7 @@
     var TAG = 'Socket'
       , self = this
       , ready
+      , refreshEvents = []
       , registeredModels = [];
 
     /**
@@ -35,6 +36,7 @@
     self.unsyncUpdates = unsyncUpdates;
     self.emit          = emit;
     self.on            = registerEvent;
+    self.onRefresh     = onRefresh;
     self.remove        = removeEvent;
     self.reset         = resetSocket;
     self.destroy       = destroy;
@@ -125,24 +127,28 @@
      * @return {promise}  Status of emit
      */
     function emit(event, data, callback) {
-      if (isConnected) {
-        return ready.then(function () {
-          logger.log(TAG, 'Emitting event: ' + event);
-          self.wrapper.emit(event, data, callback);
-        });
+      if (angular.isDefined(self.wrapper)) {
+        self.wrapper.emit(event, data, callback);
       }
     }
 
     function registerEvent(event, callback) {
-      if (ready) {
-        return ready.then(function () {
-          self.wrapper.on(event, callback);
-        });
+      if (angular.isDefined(self.wrapper)) {
+        self.wrapper.addListener(event, callback);
       }
     }
 
+    function onRefresh(event, callback) {
+      var item = {
+        event: event,
+        callback: callback
+      };
+      refreshEvents.push(item);
+      registerEvent(event, callback);
+    }
+
     function removeEvent(event, fn) {
-      if (ready) {
+      if (ready && isConnected()) {
         return ready.then(function () {
           if (fn) {
             self.wrapper.removeListener(event, fn);
@@ -336,6 +342,9 @@
       _.each(registeredModels, function (model) {
         unRegister(model);
       });
+      _.each(refreshEvents, function (item) {
+        self.wrapper.removeListener(item.event, item.callback);
+      });
       return $q.when(registeredModels);
     }
 
@@ -348,6 +357,12 @@
     function syncAll() {
       _.each(registeredModels, function (model) {
         register(model);
+      });
+      _.each(refreshEvents, function (item) {
+        if (item.event === 'connect') {
+          (item.callback || angular.noop)();
+        }
+        registerEvent(item.event, item.callback);
       });
       return $q.when(registeredModels);
     }

@@ -15,7 +15,8 @@ var sendFrame
   , frameData
   , frameWatcher
   , canStream    = true
-  , isStreaming  = false;
+  , isStreaming  = false
+  , currentlyReading = false;
 
 var imageToWatch = path.join(frameDir, config.filename + '.jpg');
 
@@ -113,17 +114,21 @@ function startMotionCapture() {
 }
 
 function readFrame(callback) {
-  fs.readFile(imageToWatch, function (err, data) {
-    if (!err) {
-      data = data.toString('base64');
-      if (frameData !== data) {
-        frameData = data;
-        callback(true);
+  if (!currentlyReading) {
+    currentlyReading = true;
+    fs.readFile(imageToWatch, function (err, data) {
+      if (!err) {
+        data = data.toString('base64');
+        if (frameData !== data) {
+          frameData = data;
+          callback(true);
+        }
+      } else {
+        callback(false);
       }
-    } else {
-      callback(false);
-    }
-  });
+      currentlyReading = false;
+    });
+  }
 }
 
 function startWatcher() {

@@ -35,35 +35,23 @@
     function ViewerCtrl() {
       var vm = this;
 
-      Feed.activate(vm.autostart)
-        .then(onActivated);
+      Feed.init(vm.autostart)
+        .then(onActivated)
+        .catch(function () {
+          logger.warning('Camera feed failed to activate', '', 'Problem Occurred');
+        });
 
       function onActivated() {
         logger.log('Viewer', 'Feed services has been activated');
         vm.feed = Feed.data;
       }
-
-      vm.fnPlay = play;
-      vm.fnStop = stop;
-      vm.fnInfo = info;
-
-      function play() {
-        console.log('Inside play');
-        Feed.toggle();
-      }
-
-      function stop() {
-        console.log('Inside stop');
-      }
-
-      function info() {
-        console.log('Inside info');
-      }
     }
 
-    function linkFunct(scope, element, attrs) {
-      /*jshint unused:false */
-      /*eslint "no-unused-vars": [2, {"args": "none"}]*/
+    function linkFunct(scope) {
+      scope.$on('$destroy', function () {
+        logger.log('Viewer', 'onDestroy stopping camera');
+        Feed.destroy();
+      });
     }
   }
 }());
