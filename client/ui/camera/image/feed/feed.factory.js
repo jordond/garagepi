@@ -49,15 +49,15 @@
      * Public Methods
      */
 
-    function init(start) {
+    function init(autostart) {
       Socket.onRefresh('connect', onConnect);
       Socket.on('disconnect', onDisconnect); // todo on refresh as well?
-      return activate(start);
+      return activate(autostart);
     }
 
     function toggle() {
       if (!data.started) {
-        start();
+        start(resume = true);
       } else if (data.streaming) {
         logger.log(TAG, 'Pausing the camera feed');
         data.streaming = false;
@@ -100,8 +100,8 @@
         });
     }
 
-    function start(start) {
-      if (resume || start) {
+    function start(shouldStart) {
+      if (resume || shouldStart) {
         registerEvents();
         Socket.emit('camera:start');
         motionTimer = $interval(checkMotion, 3000);
