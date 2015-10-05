@@ -24,7 +24,8 @@
     "animate.less": "*",
     "sweetalert": "~1.0.1",
     "angular-sweetalert-as-promised": "~1.1.0",
-    "angular-schema-form": "~0.8.2"
+    "angular-schema-form": "~0.8.2",
+    "angular-images-resizer": "~0.9.1"
   },
   "devDependencies": {},
   "overrides": {

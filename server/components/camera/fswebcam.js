@@ -19,7 +19,8 @@ function FSWebcam(filename) {
     '-q',
     '-d', config.extra.videodevice,
     '-r', config.extra.width + 'x' + config.extra.height,
-    '--no-banner'
+    '--no-banner',
+    '--scale', config.scale.w + 'x' + config.scale.h
   ];
 
   var rotateValue = config.extra.rotate;

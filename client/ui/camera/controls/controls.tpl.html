@@ -1,23 +1,17 @@
-<div class="controls-container col-md-12">
-  <div class="controls-toggle col-md-2">
-    <div class="btn btn-default" ng-click="vm.feed.toggle()">
-      <i class="fa fa-play" ng-show="!vm.feed.data.streaming"></i>
-      <i class="fa fa-pause" ng-show="vm.feed.data.streaming"></i>
-    </div>
-  </div>
-  <div class="controls-stop col-md-2">
-    <div class="btn btn-default" ng-click="vm.feed.stop()">
-      <i class="fa fa-stop"></i>
-    </div>
-  </div>
-  <div class="controls-reset col-md-2 col-md-offset-4">
-    <div class="btn btn-default" ng-click="vm.feed.reset()">
-      <i class="fa fa-repeat"></i>
-    </div>
-  </div>
-  <div class="controls-info col-md-2">
-    <div class="btn btn-default" ng-click="vm.info()">
-      <i class="fa fa-info-circle"></i>
-    </div>
-  </div>
+<div class="controls-container clearfix">
+  <a class="btn btn-link" ng-click="vm.info()">
+    <i class="fa fa-info-circle fa-lg"></i>
+  </a>
+  <a class="btn btn-link toggle" ng-click="vm.feed.toggle()">
+    <i class="fa fa-2x"
+       ng-class="vm.feed.data.streaming ? 'fa-pause' : 'fa-play'">
+    </i>
+  </a>
+  <a class="btn btn-link" ng-click="vm.feed.stop()">
+    <i class="fa fa-stop fa-lg"></i>
+  </a>
+  <a class="btn btn-link fullscreen pull-right">
+    <i class="fa fa-expand fa-lg"></i>
+  </a>
+  <a ng-click="vm.feed.data.loading = true" class="btn btn-default"></a>
 </div>

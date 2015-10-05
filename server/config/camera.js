@@ -16,6 +16,10 @@ module.exports = {
     allowedRotate: [90, 180, 270],
     filename     : 'frame',
     shutdownDelay: 0,
+    scale: {
+      w: 1280,
+      h: 720
+    },
     extra: {
       videodevice    : '/dev/video0',
       target_dir     : '/var/tmp/motion',

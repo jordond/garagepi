@@ -191,6 +191,7 @@
       unsyncAll()
         .then(function () {
           registeredModels = [];
+          refreshEvents = [];
           self.wrapper.disconnect();
           self.wrapper = undefined;
           ready = undefined;

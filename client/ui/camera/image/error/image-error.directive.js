@@ -11,7 +11,7 @@
    *
    */
   angular
-    .module('ui.camera')
+    .module('ui.camera.image')
     .directive('imgError', ImageErrorConfig);
 
   /** @ngInject */

@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('ui.camera', [
-      'ui.camera.image'
+    .module('ui.camera.image', [
+      'images-resizer'
     ]);
 }());

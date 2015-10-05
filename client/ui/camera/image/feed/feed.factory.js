@@ -9,7 +9,7 @@
    *
    */
   angular
-    .module('ui.camera')
+    .module('ui.camera.image')
     .factory('Feed', FeedConfig);
 
   /** @ngInject */
@@ -17,6 +17,7 @@
     var TAG = 'Feed'
       , service
       , data
+      , resume
       , disconnected
       , reconnectTimeout
       , motionTimer;
@@ -37,6 +38,7 @@
     service = {
       init   : init,
       toggle : toggle,
+      stop   : stop,
       destroy: destroy,
       data   : data
     };
@@ -47,10 +49,10 @@
      * Public Methods
      */
 
-    function init(autostart) {
+    function init(start) {
       Socket.onRefresh('connect', onConnect);
-      Socket.on('disconnect', onDisconnect);
-      return activate(autostart);
+      Socket.on('disconnect', onDisconnect); // todo on refresh as well?
+      return activate(start);
     }
 
     function toggle() {
@@ -59,13 +61,16 @@
       } else if (data.streaming) {
         logger.log(TAG, 'Pausing the camera feed');
         data.streaming = false;
+        resume = false;
       } else {
         logger.log(TAG, 'Resuming the camera feed');
         data.streaming = true;
+        resume = true;
       }
     }
 
     function destroy() {
+      Socket.remove('disconnect', onDisconnect);
       stop();
       resetData();
       if (reconnectTimeout) {
@@ -82,9 +87,7 @@
         .then(function (info) {
           data.info = info;
           if (info.ready) {
-            if (!info.isCapturing && autostart) {
-              start();
-            }
+            start(autostart);
           } else {
             logger.log(TAG, 'Camera feed not available Error: ' + info.error);
             data.error.hasError = true;
@@ -97,17 +100,20 @@
         });
     }
 
-    function start() {
-      registerEvents();
-      Socket.emit('camera:start');
-      motionTimer = $interval(checkMotion, 3000);
-      data.streaming = true;
-      data.started = true;
-      data.error.hasError = false;
+    function start(start) {
+      if (resume || start) {
+        registerEvents();
+        Socket.emit('camera:start');
+        motionTimer = $interval(checkMotion, 3000);
+        data.streaming = true;
+        data.started = true;
+        data.error.hasError = false;
+      }
     }
 
     function stop() {
       if (data.started) {
+        resume = false;
         unregisterEvents();
         Socket.emit('camera:stop');
         resetData();
@@ -177,8 +183,8 @@
         logger.log(TAG, 'Recieved initial frame');
         data.frame = {
           timestamp: Date.now(),
-          src: 'data:image/jpeg;base64, ' + frame,
-          prev: 'data:image/jpeg;base64, ' + frame
+          src: 'data:image/jpeg;base64,' + frame,
+          prev: 'data:image/jpeg;base64,' + frame
         };
         $timeout(function () {
           data.loading = false;
@@ -187,11 +193,11 @@
       Socket.on('camera:frame', function (frame) {
         if (!data.streaming) { return; }
         var prev = data.frame.src;
-        data.loading = false;
+        //data.loading = false; // todo remove after testing
         data.motion = true;
         data.frame = {
           timestamp: Date.now(),
-          src: 'data:image/jpeg;base64, ' + frame,
+          src: 'data:image/jpeg;base64,' + frame,
           prev: prev
         };
       });
