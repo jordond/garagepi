@@ -173,7 +173,7 @@
 
       function refreshFailed(error) {
         deactivate();
-        return $q.reject(error.data.message);
+        return $q.reject(error);
       }
     }
   }

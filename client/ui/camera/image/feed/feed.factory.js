@@ -24,7 +24,6 @@
 
     data = {
       started: false,
-      info: {},
       streaming: false,
       loading: false,
       motion: false,
@@ -40,6 +39,7 @@
       toggle : toggle,
       stop   : stop,
       destroy: destroy,
+      info   : getInfo,
       data   : data
     };
 
@@ -69,9 +69,14 @@
       }
     }
 
+    function stop() {
+      resume = false;
+      stopFeed();
+    }
+
     function destroy() {
       Socket.remove('disconnect', onDisconnect);
-      stop();
+      stopFeed();
       resetData();
       if (reconnectTimeout) {
         reconnectTimeout.cancel();
@@ -88,6 +93,7 @@
           data.info = info;
           if (info.ready) {
             start(autostart);
+            data.loading = true;
           } else {
             logger.log(TAG, 'Camera feed not available Error: ' + info.error);
             data.error.hasError = true;
@@ -105,15 +111,15 @@
         registerEvents();
         Socket.emit('camera:start');
         motionTimer = $interval(checkMotion, 3000);
+        resume = true;
         data.streaming = true;
         data.started = true;
-        data.error.hasError = false;
+        data.error = {};
       }
     }
 
-    function stop() {
+    function stopFeed() {
       if (data.started) {
-        resume = false;
         unregisterEvents();
         Socket.emit('camera:stop');
         resetData();
@@ -127,7 +133,6 @@
 
     function resetData() {
       data.started = false;
-      data.info = {};
       data.streaming = false;
       data.loading = false;
       data.motion = false;
@@ -137,7 +142,7 @@
 
     function onDisconnect() {
       disconnected = true;
-      stop();
+      stopFeed();
       resetData();
       data.error = {
         hasError: true,
@@ -164,6 +169,9 @@
 
     function getInfo() {
       var q = $q.defer();
+      if (data.info) {
+        return $q.when(data.info);
+      }
       Socket.emit('camera:info', null, function (info) {
         logger.log(TAG, 'Recieved camera information from the server');
         q.resolve(info);
@@ -193,7 +201,7 @@
       Socket.on('camera:frame', function (frame) {
         if (!data.streaming) { return; }
         var prev = data.frame.src;
-        //data.loading = false; // todo remove after testing
+        data.loading = false;
         data.motion = true;
         data.frame = {
           timestamp: Date.now(),

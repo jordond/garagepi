@@ -15,7 +15,7 @@
     .directive('cameraControls', CameraControlsConfig);
 
   /** @ngInject */
-  function CameraControlsConfig(Feed) {
+  function CameraControlsConfig(ngDialog, Feed) {
     var directive = {
       restrict: 'EA',
       scope: {},
@@ -28,14 +28,23 @@
 
     return directive;
 
-    /** @ngInject */
     function CameraControlsCtrl() {
       var vm = this;
       vm.feed = Feed;
-      vm.info = info;
+      vm.showInfo = showInfo;
 
-      function info() {
-        console.log('inside info');
+      function showInfo() {
+        Feed.info()
+          .then(function (info) {
+            var data = {};
+            data.motion = info.config.extra;
+            data.config = angular.copy(info.config);
+            delete data.config.extra;
+            ngDialog.open({
+              template: 'ui/camera/controls/info/info-modal.tpl.html',
+              data: data
+            });
+          });
       }
     }
   }

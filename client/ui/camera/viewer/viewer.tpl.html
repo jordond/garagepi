@@ -1,12 +1,11 @@
 <div class="col-md-6">
   <div class="camera-container card">
     <div class="camera-image">
-      <div class="camera-active">
-        Active
-        <i class="fa fa-circle active-yes" ng-show="vm.feed.motion"></i>
-        <i class="fa fa-circle-o active-no" ng-show="!vm.feed.motion"></i>
-      </div>
-      <div feed-loading loading="vm.feed.loading"></div>
+      <feed-status
+        loading="vm.feed.loading"
+        motion="vm.feed.motion"
+        error="vm.feed.error.hasError">
+      </feed-status>
       <div class="camera-image-feed">
         <img class="img-responsive"
           image-feed

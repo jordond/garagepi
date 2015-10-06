@@ -3,6 +3,7 @@
 
   angular
     .module('app.ui', [
+      'ui.common',
       'ui.camera'
     ]);
 }());

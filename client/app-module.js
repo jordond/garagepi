@@ -18,6 +18,7 @@
       'angularMoment',
       'toastr',
       'jutaz.ngSweetAlertAsPromised',
+      'ngDialog',
       'components',
       'app.dashboard',
       'app.account',
