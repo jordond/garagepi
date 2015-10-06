@@ -5,7 +5,7 @@ var path   = require('path');
 var spawn  = require('child_process').spawn;
 
 var config = require('../../config').camera;
-var log    = require('../logger/console')('Motion');
+var log    = require('../logger').console('Motion');
 
 var logFilename = 'motion.log';
 

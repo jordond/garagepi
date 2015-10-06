@@ -4,7 +4,7 @@ var fs       = require('fs');
 var path     = require('path');
 var spawn    = require('child_process').spawn;
 
-var log      = require('../logger/console')('Camera');
+var log      = require('../logger').console('Camera');
 var config   = require('../../config').camera;
 
 var fswebcam;

@@ -5,7 +5,7 @@ var path   = require('path');
 var spawn  = require('child_process').spawn;
 
 var config = require('../../config').camera;
-var log    = require('../logger/console')('FSWebcam');
+var log    = require('../logger').console('FSWebcam');
 
 module.exports = function (filename) {
   filename = filename ? filename :

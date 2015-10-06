@@ -1,6 +1,6 @@
 'use strict';
 
-var log             = require('../logger/console')('Socket:Camera');
+var log             = require('../logger').console('Socket:Camera');
 var config          = require('../../config').camera;
 var camera          = require('../camera');
 
