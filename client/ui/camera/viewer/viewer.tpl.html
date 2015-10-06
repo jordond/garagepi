@@ -6,13 +6,11 @@
         motion="vm.feed.motion"
         error="vm.feed.error.hasError">
       </feed-status>
-      <div class="camera-image-feed">
-        <img class="img-responsive"
-          image-feed
-          feed-height="640"
-          feed-src="{{ vm.feed.frame.src }}"
-          feed-err="{{ vm.feed.frame.prev }}">
-      </div>
+      <image-feed class="camera-image-feed"
+           feed-width="640"
+           feed-height="480"
+           feed-src="{{ vm.feed.frame.src }}">
+      </image-feed>
       <div class="camera-image-error" ng-show="vm.feed.error.hasError">
         Error: <span>{{ vm.feed.error.message }}</span>
       </div>
