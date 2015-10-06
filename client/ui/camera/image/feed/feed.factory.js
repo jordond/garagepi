@@ -51,7 +51,7 @@
 
     function init(autostart) {
       Socket.onRefresh('connect', onConnect);
-      Socket.on('disconnect', onDisconnect); // todo on refresh as well?
+      Socket.onRefresh('disconnect', onDisconnect);
       return activate(autostart);
     }
 
