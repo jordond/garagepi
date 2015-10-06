@@ -11,7 +11,7 @@ var express = require('express');
 var mongoose = require('mongoose');
 var config = require('./config');
 var gpio = require('./components/gpio');
-var log = require('./components/logger/console')('App');
+var log = require('./components/logger').console('App');
 
 // Check logger level
 var level = config.log.level.toUpperCase();

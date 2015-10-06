@@ -2,7 +2,7 @@
 
 var path = require('path');
 var fs = require('fs');
-var log = require('../components/logger/console')('Config');
+var log = require('../components/logger').console('Config');
 var _ = require('lodash');
 
 function requiredProcessEnv(name) {

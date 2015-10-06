@@ -7,7 +7,7 @@
 var glob = require('glob');
 
 var config = require('./index');
-var log = require('../components/logger/console')('Socket');
+var log = require('../components/logger').console('Socket');
 var camera = require('../components/camera/camera.socket');
 
 var socketCount = 0;

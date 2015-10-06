@@ -2,9 +2,11 @@
 
 var Gpio = require('onoff').Gpio;
 var GpioModel = require('../../api/gpio/gpio.model');
-var log = require('../logger/console')('Gpio');
+var log = require('../logger/').console('Gpio');
 
 var pins = [];
+var wasError = false;
+var errors = 0;
 
 var service = {
   pins: pins,
@@ -35,6 +37,9 @@ function initialize() {
         log.info('Exporting [' + gpio.name + ']');
         setupPins(gpio);
       });
+      if (wasError) {
+        return log.warn('Initialization has completed, with [' + errors + '] errors');
+      }
       log.log('Initialization has completed, [' + gpios.length + '] pairs exported');
     }
   });
@@ -77,8 +82,11 @@ function close() {
  * Generic error handler
  * @param  {Object} err Error object
  */
-function handleError(err) {
-  return log.error(err.message || 'Generic error', err);
+function handleError(err, message) {
+  wasError = true;
+  errors++;
+  log.error(message || err.message || 'Generic error');
+  return log.verbose(err);
 }
 
 /**
@@ -138,7 +146,7 @@ function createPin(settings, debounce) {
     log.debug('Exported pin #[' + settings.pin + '] direction [' + settings.direction + ']');
     return pin;
   } catch (error) {
-    log.error('Failed to export pin #[' + settings.pin +']');
+    handleError(error, 'Failed to export pin #[' + settings.pin +']');
     return false;
   }
 }
@@ -154,7 +162,7 @@ function setSensorStatus(input, value, showLog) {
   input.save(function (err) {
     if (err) return handleError(err);
     if (showLog) {
-      log.log('Sensor status was saved');
+      log.verbose('Sensor status was saved');
     }
   });
 }

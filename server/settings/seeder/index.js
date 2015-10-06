@@ -12,7 +12,7 @@
 var fs = require('fs');
 var path = require('path');
 
-var log = require('../../components/logger/console')('Seeder');
+var log = require('../../components/logger').console('Seeder');
 var config = require('../../config');
 var seeder = require('./seeder');
 
