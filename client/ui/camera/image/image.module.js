@@ -3,7 +3,6 @@
 
   angular
     .module('ui.camera.image', [
-      'images-resizer',
-      'ngPrettyJson'
+      'images-resizer'
     ]);
 }());
