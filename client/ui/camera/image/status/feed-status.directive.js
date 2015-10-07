@@ -19,6 +19,7 @@
     var directive = {
       restrict: 'EA',
       scope: {
+        streaming: '=',
         loading: '=',
         motion: '=',
         error: '='
