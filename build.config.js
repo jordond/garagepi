@@ -40,5 +40,5 @@ module.exports = {
   username: 'pi',
   port: 22,
   destination: '/opt/garagepi',
-  clean: false
+  clean: true
 };

@@ -233,5 +233,27 @@ module.exports = function (gulp, $, config) {
     .pipe(gulp.dest(config.buildJson));
   });
 
-  gulp.task('build:client', ['bowerInject', 'bowerAssets', 'images', 'fonts', 'json']);
+  gulp.task('deleteTemplates', ['compile'], function (cb) {
+    if (!isProd) {
+      return cb();
+    }
+    gulp.src([config.buildDir + '**/*.html'])
+      .pipe(gulp.dest('tmp/' + config.buildDir))
+      .on('end', function () {
+        $.del([
+          config.buildDir + '*',
+          '!' + config.buildCss,
+          '!' + config.buildFonts,
+          '!' + config.buildImages,
+          '!' + config.buildJs,
+          '!' + config.buildJson,
+          '!' + config.extDir,
+          '!' + config.buildDir + 'index.html'
+        ], {mark: true}, cb);
+      });
+});
+
+  gulp.task('compile', ['bowerInject', 'bowerAssets', 'images', 'fonts', 'json']);
+
+  gulp.task('build:client', ['deleteTemplates']);
 };
