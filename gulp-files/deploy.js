@@ -10,6 +10,7 @@ module.exports = function (gulp, $, config) {
       port: config.port,
       emptyDirectories: true,
       clean: config.clean,
+      recursive: config.clean,
       exclude: 'env.js',
       compress: true
     };
