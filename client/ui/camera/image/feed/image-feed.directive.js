@@ -18,6 +18,7 @@
   function ImageFeedConfig($q, logger, resizeService) {
     var directive = {
       scope: {
+        feedStreaming: '@',
         feedWidth: '@',
         feedHeight: '@',
         feedSrc: '@'
@@ -42,9 +43,6 @@
         resize(value)
           .then(function (image) {
             vm.frame = image;
-          })
-          .catch(function () {
-            vm.frame = false;
           });
       });
 
