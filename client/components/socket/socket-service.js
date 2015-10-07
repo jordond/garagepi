@@ -22,6 +22,7 @@
     var TAG = 'Socket'
       , self = this
       , ready
+      , isRefreshing
       , refreshEvents = []
       , registeredModels = [];
 
@@ -168,11 +169,13 @@
      */
     function resetSocket() {
       if (isConnected()) {
+        isRefreshing = true;
         unsyncAll()
           .then(function () {
             self.wrapper.emit('info', 'Refreshing user token');
             self.wrapper.disconnect();
             connect().then(syncAll);
+            isRefreshing = false;
           });
       } else {
         init();
@@ -344,6 +347,9 @@
         unRegister(model);
       });
       _.each(refreshEvents, function (item) {
+        if (item.event === 'disconnect') {
+          (item.callback || angular.noop)(item.event, isRefreshing);
+        }
         self.wrapper.removeListener(item.event, item.callback);
       });
       return $q.when(registeredModels);
@@ -361,7 +367,7 @@
       });
       _.each(refreshEvents, function (item) {
         if (item.event === 'connect') {
-          (item.callback || angular.noop)();
+          (item.callback || angular.noop)(item.event, isRefreshing);
         }
         registerEvent(item.event, item.callback);
       });

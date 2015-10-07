@@ -18,6 +18,7 @@
       , service
       , data
       , resume
+      , registered
       , disconnected
       , reconnectTimeout
       , motionTimer;
@@ -108,7 +109,9 @@
 
     function start(shouldStart) {
       if (resume || shouldStart) {
-        registerEvents();
+        if (!disconnected) {
+          registerEvents();
+        }
         Socket.emit('camera:start');
         motionTimer = $interval(checkMotion, 3000);
         resume = true;
@@ -120,8 +123,10 @@
 
     function stopFeed() {
       if (data.started) {
-        unregisterEvents();
-        Socket.emit('camera:stop');
+        if (!disconnected) {
+          unregisterEvents();
+          Socket.emit('camera:stop');
+        }
         resetData();
         if (angular.isDefined(motionTimer)) {
           logger.log(TAG, 'Stopping motion active checker');
@@ -140,21 +145,27 @@
       data.error.hasError = false;
     }
 
-    function onDisconnect() {
+    function onDisconnect(event, isRefresh) {
       disconnected = true;
       stopFeed();
-      resetData();
-      data.error = {
-        hasError: true,
-        message: 'Connection to server has been lost'
-      };
+      if (isRefresh) {
+        registered = false;
+        data.loading = true;
+      } else {
+        resetData();
+        data.error = {
+          hasError: true,
+          message: 'Connection to server has been lost'
+        };
+      }
       if (reconnectTimeout) {
         reconnectTimeout.cancel();
+        reconnectTimeout = null;
       }
     }
 
-    function onConnect() {
-      if (!reconnectTimeout && disconnected) {
+    function onConnect(event, isRefresh) {
+      if ((!reconnectTimeout && disconnected) || isRefresh) {
         reconnectTimeout = $timeout(run, 2000);
         disconnected = false;
       }
@@ -180,6 +191,7 @@
     }
 
     function registerEvents() {
+      if (registered) { return; }
       logger.log(TAG, 'Registering camera events');
       Socket.on('camera:loading', function () {
         if (!data.streaming) { return; }
@@ -209,12 +221,16 @@
           prev: prev
         };
       });
+      registered = true;
     }
 
     function unregisterEvents() {
-      Socket.remove('camera:loading');
-      Socket.remove('camera:initial');
-      Socket.remove('camera:frame');
+      if (!disconnected) {
+        Socket.remove('camera:loading');
+        Socket.remove('camera:initial');
+        Socket.remove('camera:frame');
+        registered = false;
+      }
     }
 
     function checkMotion() {
