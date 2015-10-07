@@ -98,6 +98,10 @@
 
       function success(response) {
         currentUser = response.data;
+        if (response.newToken) {
+          Token.store(response.newtoken);
+          logger.log('Auth', 'Updated token');
+        }
         return response.data;
       }
 
