@@ -95,10 +95,10 @@
           if (info.ready) {
             start(autostart);
             data.loading = true;
-          } else {
-            logger.log(TAG, 'Camera feed not available Error: ' + info.error);
+          } else if (info.error) {
+            logger.log(TAG, 'Camera feed not available Error: ' + info.error.message);
             data.error.hasError = true;
-            data.error.message = info.error;
+            data.error.message = info.error.message;
           }
         })
         .catch(function (err) {
@@ -145,6 +145,26 @@
       data.error.hasError = false;
     }
 
+    function onConnect(event, isRefresh) {
+      if ((!reconnectTimeout && disconnected) || isRefresh) {
+        reconnectTimeout = $timeout(run, 2000);
+        disconnected = false;
+      }
+
+      function run() {
+        logger.log(TAG, 'Attempting to reactivate camera feed');
+        reconnectTimeout = null;
+        resetData();
+        start();
+      }
+    }
+
+    function onError(err) {
+      stopFeed();
+      data.error = err.error;
+      data.info = err.config;
+    }
+
     function onDisconnect(event, isRefresh) {
       disconnected = true;
       stopFeed();
@@ -164,20 +184,6 @@
       }
     }
 
-    function onConnect(event, isRefresh) {
-      if ((!reconnectTimeout && disconnected) || isRefresh) {
-        reconnectTimeout = $timeout(run, 2000);
-        disconnected = false;
-      }
-
-      function run() {
-        logger.log(TAG, 'Attempting to reactivate camera feed');
-        reconnectTimeout = null;
-        resetData();
-        start();
-      }
-    }
-
     function getInfo() {
       var q = $q.defer();
       if (data.info) {
@@ -193,6 +199,7 @@
     function registerEvents() {
       if (registered) { return; }
       logger.log(TAG, 'Registering camera events');
+      Socket.on('camera:error', onError);
       Socket.on('camera:loading', function () {
         if (!data.streaming) { return; }
         logger.log(TAG, 'Camera feed is loading');

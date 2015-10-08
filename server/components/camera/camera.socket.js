@@ -22,7 +22,13 @@ function init(socketio) {
 function onConnection(socket) {
   socket.on('camera:info', function (data, callback) {
     if (!camera.canStream()) {
-      return callback({ready: false, error: 'Device not found'});
+      return callback({
+        ready: false,
+        error: {
+          message: 'Video device not found',
+          hasError: true
+        }
+      });
     }
     callback({
       ready: true,

@@ -10,11 +10,13 @@ var config   = require('../../config').camera;
 var fswebcam;
 var motion;
 
-var sendFrame
+var emit
   , frameDir     = config.extra.target_dir
   , frameData
   , frameWatcher
-  , canStream    = true
+  , pollSpeed = config.devicePolling > 30 ? config.devicePolling : 30
+  , cameraCheck
+  , canStream    = false
   , isStreaming  = false
   , currentlyReading = false;
 
@@ -37,32 +39,16 @@ module.exports = service;
 
 function init(callback) {
   log.log('Initializing camera module');
-  sendFrame = callback;
+  log.info('Setting video device poller to [' + pollSpeed + '] seconds');
+  emit = callback;
 
-  fs.stat(config.extra.videodevice, function (err) {
-    if (err) {
-      log.error('Video device [' + config.extra.videodevice + '] not found')
-      log.error('Skipping camera setup, add device and restart');
-      canStream = false;
-    } else {
-      fswebcam = require('./fswebcam')();
-      motion = require('./motion')();
-      fs.stat(frameDir, onDirStat);
-    }
-  });
+  setupCamera();
+  cameraCheck = setInterval(setupCamera, pollSpeed * 1000);
 
   process
     .on('SIGINT', stopStreaming)
     .on('SIGTERM', stopStreaming)
     .on('exit', stopStreaming);
-
-  function onDirStat(err) {
-    if (err) {
-      log.info('Creating capture directory [' + frameDir + ']');
-      fs.mkdirSync(frameDir);
-    }
-    log.info('Using [' + frameDir + '] for frame capture');
-  }
 }
 
 function getCanStream() { return canStream; }
@@ -75,6 +61,47 @@ function getFrame() { return frameData; }
  * Private Helpers
  */
 
+function setupCamera() {
+  checkCamera(function (exists) {
+    if (exists) {
+      if (!canStream) {
+        fswebcam = require('./fswebcam')();
+        motion = require('./motion')();
+        fs.stat(frameDir, onDirStat);
+        canStream = true;
+      }
+    } else {
+      log.error('Video device [' + config.extra.videodevice + '] not found');
+      log.error('Connect device, next check in [' + pollSpeed + '] seconds');
+      if (canStream) {
+        emit('camera:error', {
+          error: {
+            hasError: true,
+            message: 'Video device not found'
+          },
+          ready: false,
+          config: config
+        });
+      }
+      canStream = false;
+    }
+  });
+
+  function onDirStat(err) {
+    if (err) {
+      log.info('Creating capture directory [' + frameDir + ']');
+      fs.mkdirSync(frameDir);
+    }
+    log.info('Using [' + frameDir + '] for frame capture');
+  }
+}
+
+function checkCamera(callback) {
+  fs.stat(config.extra.videodevice, function (err) {
+    callback(err ? false : true);
+  });
+}
+
 function startStreaming() {
   if (!canStream) { return; }
   log.info('Initializing the frame capture')
@@ -85,7 +112,7 @@ function startStreaming() {
     isStreaming = wasSuccess;
     if (wasSuccess) {
       readFrame(function (wasRead) {
-        sendFrame('camera:initial', frameData);
+        emit('camera:initial', frameData);
       });
       startMotionCapture();
     }
@@ -103,7 +130,7 @@ function stopStreaming() {
 
 function startMotionCapture() {
   log.log('Starting motion capture process');
-  sendFrame('camera:loading');
+  emit('camera:loading');
   motion.start(function (errorCode) {
     if (!errorCode) { return; }
     log.error('Motion encountered an error [' + errorCode + ']');
@@ -144,7 +171,7 @@ function startWatcher() {
   function onInterval() {
     readFrame(function (wasRead) {
       if (wasRead) {
-        sendFrame('camera:frame', frameData);
+        emit('camera:frame', frameData);
       }
     });
   }
