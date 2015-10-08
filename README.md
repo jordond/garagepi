@@ -1,6 +1,6 @@
 # Garage Pi
 
-An updated version of my closed source project, Garage Pi is a web front end for my Raspberry Pi garage automation system.
+An updated version of my closed source project, Garage Pi is a web front end for my Raspberry Pi garage automation system.  Powered by AngularJS, NodeJS, ExpressJS, Mongo and SocketIO.
 
 ## Features
 1. JWT for API authorization.
