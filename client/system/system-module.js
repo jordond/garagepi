@@ -7,8 +7,8 @@
    *
    */
   angular
-    .module('system', [
+    .module('app.system', [
       'ui.router',
-      'system.users'
+      'app.system.users'
     ]);
 }());

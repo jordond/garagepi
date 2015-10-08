@@ -1,0 +1,24 @@
+<div class="col-md-6">
+  <div class="camera-container card">
+    <div class="camera-image">
+      <feed-status
+        streaming="vm.feed.streaming"
+        loading="vm.feed.loading"
+        motion="vm.feed.motion"
+        error="vm.feed.error.hasError">
+      </feed-status>
+      <image-feed class="camera-image-feed"
+           feed-streaming="{{ vm.feed.streaming || vm.feed.loading }}"
+           feed-width="640"
+           feed-height="480"
+           feed-src="{{ vm.feed.frame.src }}">
+      </image-feed>
+      <div class="camera-image-error" ng-show="vm.feed.error.hasError">
+        Error: <span>{{ vm.feed.error.message }}</span>
+      </div>
+    </div>
+    <div class="card-action">
+      <div camera-controls></div>
+    </div>
+  </div>
+</div>

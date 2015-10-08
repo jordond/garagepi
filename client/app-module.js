@@ -18,10 +18,12 @@
       'angularMoment',
       'toastr',
       'jutaz.ngSweetAlertAsPromised',
+      'ngDialog',
       'components',
-      'dashboard',
-      'account',
-      'system'
+      'app.dashboard',
+      'app.account',
+      'app.system',
+      'app.ui'
     ]);
 
   angular

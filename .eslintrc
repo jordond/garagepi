@@ -38,7 +38,7 @@
     "angular/ng_typecheck_string": [2, true],
     "angular/ng_window_service": [2, true],
     "block-scoped-var": [2, true],
-    "brace-style": [2, "1tbs", {"allowSingleLine": false}],
+    "brace-style": [2, "1tbs", {"allowSingleLine": true}],
     "camelcase": [2, true],
     "comma-dangle": [2, "never"],
     "comma-spacing": [2, {
@@ -192,13 +192,13 @@
     "spaced-line-comment": [2, "always"],
     "strict": "global",
     "use-isnan": [2, true],
-    "valid-jsdoc": [2, {
+    "valid-jsdoc": [0, {
       "requireParamDescription": true,
       "requireReturn": false,
       "requireReturnDescription": true
     }],
     "valid-typeof": [2, true],
-    "vars-on-top": [2, true],
+    "vars-on-top": [0, true],
     "wrap-iife": [2, "outside"],
     "wrap-regex": [2, "always"],
     "yoda": [2, "never"]

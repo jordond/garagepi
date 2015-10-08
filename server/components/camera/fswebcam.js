@@ -5,7 +5,7 @@ var path   = require('path');
 var spawn  = require('child_process').spawn;
 
 var config = require('../../config').camera;
-var log    = require('../logger/console')('FSWebcam');
+var log    = require('../logger').console('FSWebcam');
 
 module.exports = function (filename) {
   filename = filename ? filename :
@@ -18,7 +18,9 @@ function FSWebcam(filename) {
   this.arguments = [
     '-q',
     '-d', config.extra.videodevice,
-    '--no-banner'
+    '-r', config.extra.width + 'x' + config.extra.height,
+    '--no-banner',
+    '--scale', config.scale.w + 'x' + config.scale.h
   ];
 
   var rotateValue = config.extra.rotate;

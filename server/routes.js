@@ -10,7 +10,7 @@ var path = require('path');
 var config = require('./config');
 var errors = require('./components/errors');
 var auth = require('./auth/auth.service');
-var log = require('./components/logger/console')('Routes');
+var log = require('./components/logger').console('Routes');
 
 var debug = require('./components/errors/error.controller');
 

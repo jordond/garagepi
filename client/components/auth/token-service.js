@@ -12,13 +12,12 @@
     .module('components')
     .service('Token', Token);
 
-  Token.$inject = ['$cookieStore', '$q', '$interval', '$timeout', '$http', 'logger', 'AuthEvent'];
+  Token.$inject = ['$cookieStore', '$q', '$interval', '$http', 'logger', 'AuthEvent'];
 
-  function Token($cookieStore, $q, $interval, $timeout, $http, logger, AuthEvent) {
+  function Token($cookieStore, $q, $interval, $http, logger, AuthEvent) {
     var TAG = 'Token'
       , self = this
       , activeToken = $cookieStore.get('token')
-      , timeout
       , refresher;
 
     /**
@@ -38,9 +37,7 @@
      * Listeners
      */
 
-    AuthEvent.onAuth(function (event, refreshNow) {
-      activate(refreshNow);
-    });
+    AuthEvent.onAuth(activate);
     AuthEvent.onDeauth(destroy);
 
     /**
@@ -83,8 +80,10 @@
      * @param  {String} token User JWT
      */
     function store(token) {
-      activeToken = token;
-      $cookieStore.put('token', token);
+      if (token) {
+        activeToken = token;
+        $cookieStore.put('token', token);
+      }
     }
 
     /**
@@ -103,21 +102,15 @@
      * @param {Boolean} refreshNow whether or not to refresh right away
      * @param {int} delay Interval delay default 1 hour
      */
-    function activate(refreshNow, delay) {
-      delay = angular.isDefined(delay) ? delay : (1 * 60 * 60 * 1000);
+    function activate(delay) {
+      delay = angular.isDefined(delay) && angular.isNumber(delay) ?
+        delay : (1 * 60 * 60 * 1000);
       if (angular.isDefined(refresher)) {
         return;
       }
 
       logger.log(TAG, 'Starting token refresher');
       refresher = $interval(refreshToken, delay);
-
-      if (refreshNow) {
-        timeout = $timeout(function () {
-          refreshToken();
-          timeout = undefined;
-        }, 60 * 1000);
-      }
     }
 
     /**
@@ -138,9 +131,6 @@
      * logging the user out
      */
     function destroy() {
-      if (timeout) {
-        $timeout.cancel(timeout);
-      }
       deactivate();
       remove();
     }
@@ -157,9 +147,6 @@
      * @return {String} New or old token
      */
     function refreshToken() {
-      if (timeout) {
-        $timeout.cancel(timeout);
-      }
       return $http.get('auth/refresh')
         .then(refreshSuccess)
         .catch(refreshFailed);
@@ -173,7 +160,7 @@
 
       function refreshFailed(error) {
         deactivate();
-        return $q.reject(error.data.message);
+        return $q.reject(error);
       }
     }
   }

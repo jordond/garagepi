@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('account')
+    .module('app.account')
     .config(config);
 
   function config($stateProvider) {

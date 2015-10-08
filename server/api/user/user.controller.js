@@ -93,9 +93,10 @@ exports.changePassword = function (req, res, next) {
  * Get my info
  */
 exports.me = function (req, res, next) {
-  var userId;
+  var userId, token, newToken;
   if (typeof req.user !== 'undefined') {
     userId = req.user._id;
+    token = req.user.token;
   }
 
   User.findOne({
@@ -103,7 +104,9 @@ exports.me = function (req, res, next) {
   }, '-salt -hashedPassword', function(err, user) {
     if (err) return next(err);
     if (!user) return res.status(401).json({message: 'Either you were logged out, or server restarted'});
-    res.status(200).json({data: user});
+
+    newToken = auth.replaceToken(user, token);
+    res.status(200).json({data: user, newToken: newToken});
   });
 };
 

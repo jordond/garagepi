@@ -7,7 +7,7 @@
    *
    */
   angular
-    .module('account', [
+    .module('app.account', [
       'ui.router',
       'schemaForm'
     ]);

@@ -9,7 +9,7 @@
    *
    */
   angular
-    .module('account')
+    .module('app.account')
     .controller('LoginCtrl', LoginCtrl);
 
   function LoginCtrl($location, Auth) {

@@ -11,7 +11,7 @@
    *
    */
   angular
-    .module('system')
+    .module('app.system.users')
     .directive('usersTable', usersTable);
 
   usersTable.$injector = ['$state', '$stateParams', 'Auth', 'UserData', 'SweetAlert'];

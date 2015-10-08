@@ -22,6 +22,8 @@
     var TAG = 'Socket'
       , self = this
       , ready
+      , isRefreshing
+      , refreshEvents = []
       , registeredModels = [];
 
     /**
@@ -35,6 +37,7 @@
     self.unsyncUpdates = unsyncUpdates;
     self.emit          = emit;
     self.on            = registerEvent;
+    self.onRefresh     = onRefresh;
     self.remove        = removeEvent;
     self.reset         = resetSocket;
     self.destroy       = destroy;
@@ -119,30 +122,40 @@
 
     /**
      * Emit data to the socket
-     * @param  {String} event Name of the event
-     * @param  {Object} data  info in call
-     * @return {promise}      Status of emit
+     * @param  {String}   event    Name of the event
+     * @param  {Object}   data     info in call
+     * @param  {Function} callback on complete
+     * @return {promise}  Status of emit
      */
-    function emit(event, data) {
-      if (isConnected) {
-        return ready.then(function () {
-          self.wrapper.emit(event, data);
-        });
+    function emit(event, data, callback) {
+      if (angular.isDefined(self.wrapper)) {
+        self.wrapper.emit(event, data, callback);
       }
     }
 
     function registerEvent(event, callback) {
-      if (ready) {
-        return ready.then(function () {
-          self.wrapper.on(event, callback);
-        });
+      if (angular.isDefined(self.wrapper)) {
+        self.wrapper.addListener(event, callback);
       }
     }
 
-    function removeEvent(event) {
-      if (ready) {
+    function onRefresh(event, callback) {
+      var item = {
+        event: event,
+        callback: callback
+      };
+      refreshEvents.push(item);
+      registerEvent(event, callback);
+    }
+
+    function removeEvent(event, fn) {
+      if (ready && isConnected()) {
         return ready.then(function () {
-          self.wrapper.removeAllListeners(event);
+          if (fn) {
+            self.wrapper.removeListener(event, fn);
+          } else {
+            self.wrapper.removeAllListeners(event);
+          }
         });
       }
     }
@@ -156,11 +169,13 @@
      */
     function resetSocket() {
       if (isConnected()) {
+        isRefreshing = true;
         unsyncAll()
           .then(function () {
             self.wrapper.emit('info', 'Refreshing user token');
             self.wrapper.disconnect();
             connect().then(syncAll);
+            isRefreshing = false;
           });
       } else {
         init();
@@ -179,6 +194,7 @@
       unsyncAll()
         .then(function () {
           registeredModels = [];
+          refreshEvents = [];
           self.wrapper.disconnect();
           self.wrapper = undefined;
           ready = undefined;
@@ -222,10 +238,11 @@
       socket.on('connect', function () {
         self.wrapper.socket(socket);
         self.id = socket.id;
-        registerSocketEvents(socket);
         log('Connected');
         deferred.resolve();
       });
+      registerSocketEvents(socket);
+
       return deferred.promise;
     }
 
@@ -245,6 +262,12 @@
       });
       socket.on('reconnect_failed', function (error) {
         logger.error('Failed to reconnect to server, try logging in', error, 'SocketIO');
+      });
+      socket.on('server:error', function (data) {
+        logger.error(data.message, data.info, data.title);
+      });
+      socket.on('server:warning', function (data) {
+        logger.warning(data.message, data.info, data.title || 'Server Error');
       });
     }
 
@@ -323,6 +346,12 @@
       _.each(registeredModels, function (model) {
         unRegister(model);
       });
+      _.each(refreshEvents, function (item) {
+        if (item.event === 'disconnect') {
+          (item.callback || angular.noop)(item.event, isRefreshing);
+        }
+        self.wrapper.removeListener(item.event, item.callback);
+      });
       return $q.when(registeredModels);
     }
 
@@ -335,6 +364,12 @@
     function syncAll() {
       _.each(registeredModels, function (model) {
         register(model);
+      });
+      _.each(refreshEvents, function (item) {
+        if (item.event === 'connect') {
+          (item.callback || angular.noop)(item.event, isRefreshing);
+        }
+        registerEvent(item.event, item.callback);
       });
       return $q.when(registeredModels);
     }

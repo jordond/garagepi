@@ -7,7 +7,7 @@
    *
    */
   angular
-    .module('dashboard', [
+    .module('app.dashboard', [
       'ui.router'
     ]);
 }());

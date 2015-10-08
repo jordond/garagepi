@@ -44,6 +44,7 @@ function isAuthenticated() {
 
       userToken = getToken(req.headers.authorization);
       if (user.tokens.indexOf(userToken) > -1 || !config.secureApi) {
+        user.token = userToken;
         req.user = user;
         next();
       } else {
@@ -61,7 +62,7 @@ function attachId(req, res, next) {
       decoded = jwt.decode(token);
       userId = decoded ? decoded._id : false;
       if (userId) {
-        req.user = {_id: userId};
+        req.user = {_id: userId, token: token};
       }
       next();
     });
@@ -255,6 +256,19 @@ function removeStaleTokens(tokens) {
   return validTokens;
 }
 
+function replaceToken(user, activeToken) {
+  if (!activeToken) { return false; }
+  var newToken = signToken(user._id)
+    , index = user.tokens.indexOf(activeToken);
+  if (index !== -1) {
+    user.tokens[index] = newToken;
+    delete user.token;
+    user.save();
+    return newToken;
+  }
+
+}
+
 /**
  * Returns a jwt token signed by the app secret
  */
@@ -282,5 +296,6 @@ exports.isMeOrHasRole   = isMeOrHasRole;
 exports.logout          = logout;
 exports.checkIsAdmin    = checkIsAdmin;
 exports.compareRole     = compareRole;
+exports.replaceToken    = replaceToken;
 exports.signToken       = signToken;
 exports.setTokenCookie  = setTokenCookie;

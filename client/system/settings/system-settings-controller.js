@@ -9,7 +9,7 @@
    *
    */
   angular
-    .module('system')
+    .module('app.system')
     .controller('SystemSettingsCtrl', SystemSettingsCtrl);
 
   // SystemSettingsCtrl.$inject = [''];

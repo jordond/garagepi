@@ -1,0 +1,14 @@
+<div class="status" ng-show="streaming || error || loading">
+  <div class="status-motion" ng-hide="loading || error">
+    Active
+    <i class="fa"
+      ng-class="motion ? 'fa-circle active' : 'fa-circle-o inactive'">
+    </i>
+  </div>
+  <div class="status-loading" ng-hide="!loading || error">
+    Loading <i class="fa fa-spinner fa-spin"></i>
+  </div>
+  <div class="status-error" ng-hide="!error || loading">
+    Error <i class="fa fa-ban"></i>
+  </div>
+</div>

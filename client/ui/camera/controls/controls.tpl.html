@@ -1,0 +1,16 @@
+<div class="controls-container clearfix">
+  <a class="btn btn-link" ng-click="vm.showInfo()">
+    <i class="fa fa-info-circle fa-lg"></i>
+  </a>
+  <a class="btn btn-link toggle" ng-click="vm.feed.toggle()">
+    <i class="fa fa-2x"
+       ng-class="vm.feed.data.streaming ? 'fa-pause' : 'fa-play'">
+    </i>
+  </a>
+  <a class="btn btn-link" ng-click="vm.feed.stop()">
+    <i class="fa fa-stop fa-lg"></i>
+  </a>
+  <a class="btn btn-link fullscreen pull-right">
+    <i class="fa fa-expand fa-lg"></i>
+  </a>
+</div>
