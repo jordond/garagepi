@@ -28,7 +28,7 @@ module.exports = service;
  */
 function initialize() {
   GpioModel.find(function (err, gpios) {
-    if (err) return handleError(err);
+    if (err) { return handleError(err); }
     if (!gpios.length) {
       log.warn('No pins were found');
       return;
@@ -47,19 +47,17 @@ function initialize() {
 
 /**
  * Toggle the output gpio from the pin pair
- * @param  {ObjectId}   id     Database id of the pin pair
+ * @param  {Object}   pin      Pin object
  * @param  {Function} callback Call when actions finished
  * @return {Function}          The callback
  */
-function toggle(id, callback) {
+function toggle(pin, callback) {
   var toggled = false;
-  pins.forEach(function (pin) {
-    if (pin.id === id) {
-      log.info('Toggling [' + pin.name + '] door');
-      writeOutput(pin.door);
-      toggled = true;
-    }
-  });
+  if (pin && pin.door) {
+    log.info('Toggling [' + pin.name + '] door');
+    writeOutput(pin.door);
+    toggled = true;
+  }
   return callback(toggled);
 }
 
@@ -102,12 +100,12 @@ function setupPins(gpio) {
   var door = createPin(gpio.output, 600);
   if (sensor) {
     sensor.read(function (err, value) {
-      if (err) return handleError(err);
+      if (err) { return handleError(err); }
       log.debug('Reading ' + gpio.name + ' sensor\'s initial state, value [' + value + ']');
       setSensorStatus(gpio.input, value);
     });
     sensor.watch(function (err, value) {
-      if (err) return handleError(err);
+      if (err) { return handleError(err); }
       log.info(gpio.name + ' sensor changed, value [' + value + ']');
       setSensorStatus(gpio.input, value, true);
     });
@@ -160,7 +158,7 @@ function createPin(settings, debounce) {
 function setSensorStatus(input, value, showLog) {
   input.value = value === 1 ? true : false;
   input.save(function (err) {
-    if (err) return handleError(err);
+    if (err) { return handleError(err); }
     if (showLog) {
       log.verbose('Sensor status was saved');
     }

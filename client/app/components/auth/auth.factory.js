@@ -86,7 +86,6 @@
     /**
      * Grab the current logged in user
      * @return {Object} Current user
-     * @return {String} Error message
      */
     function getSelf() {
       currentUser = User.me()

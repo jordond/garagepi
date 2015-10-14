@@ -104,7 +104,7 @@ function checkCamera(callback) {
 
 function startStreaming() {
   if (!canStream) { return; }
-  log.info('Initializing the frame capture')
+  log.info('Initializing the frame capture');
   isStreaming = true;
   fswebcam.capture(onCapture);
 
@@ -145,9 +145,9 @@ function readFrame(callback) {
     currentlyReading = true;
     fs.readFile(imageToWatch, function (err, data) {
       if (!err) {
-        data = data.toString('base64');
-        if (frameData !== data) {
-          frameData = data;
+        var frame = data.toString('base64');
+        if (frameData !== frame) {
+          frameData = frame;
           callback(true);
         }
       } else {
