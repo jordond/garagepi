@@ -79,7 +79,7 @@ function isValidToken() {
   })
   .use(function (req, res, next) {
     User.findById(req.user._id, function (err, user) {
-      if (err) return next(err);
+      if (err) { return next(err); }
       if (!user) {
         return res.sendStatus(406);
       }
@@ -139,8 +139,8 @@ function revokeToken() {
       user.tokens = [];
       user.save(function (err) {
         if (err) { return res.status(500).json(err); }
-        return res.status(200).json({message: user.username + '\'s token was revoked.'});
-      })
+        return res.status(200).json({ message: user.username + '\'s token was revoked.' });
+      });
     });
   }
 }

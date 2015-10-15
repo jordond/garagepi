@@ -69,12 +69,12 @@ function registerOtherRoutes(app) {
 }
 
 function displayInsecureWarning() {
-  log.warn('=========================================')
+  log.warn('=========================================');
   log.warn('=   RUNNING WITH API IN INSECURE MODE   =');
   if (process.env.NODE_ENV === 'production') {
     log.warn('=  NO AUTHENTICATION REQUIRED FOR API   =');
     log.warn('=       SET secureApi IN env.js!        =');
   }
-  log.warn('= Ignore this warning if it is intended =')
+  log.warn('= Ignore this warning if it is intended =');
   log.warn('=========================================');
 }

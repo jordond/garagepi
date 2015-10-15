@@ -47,7 +47,7 @@
      * @return {promise}     Take action once resolved
      */
     function login(user) {
-      return $http.post('/auth/local', {
+      return $http.post('auth/local', {
           email: user.email,
           password: user.password
         })
@@ -74,7 +74,7 @@
      */
     function logout() {
       if (Token.has()) {
-        $http.get('/auth/logout')
+        $http.get('auth/logout')
           .then(function () {
             AuthEvent.deauthenticated();
             currentUser = {};
@@ -134,7 +134,7 @@
     }
 
     function revoke(id) {
-      return $http.put('/auth/revoke', {id: id})
+      return $http.put('auth/revoke', {id: id})
         .then(revokeSuccess)
         .catch(revokeFailed);
 

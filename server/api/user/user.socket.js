@@ -6,14 +6,14 @@
 
 var user = require('./user.model');
 
-exports.register = function(socket) {
+exports.register = function (socket) {
   user.schema.post('save', function (doc) {
     onSave(socket, doc.profile);
   });
   user.schema.post('remove', function (doc) {
     onRemove(socket, doc.profile);
   });
-}
+};
 
 function onSave(socket, doc, cb) {
   socket.emit('user:save', doc);

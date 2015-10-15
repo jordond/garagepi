@@ -133,7 +133,7 @@ exports.update = function (req, res, next) {
     if (!user) return res.status(404).json({message: 'Specified user not found'});
     user.username = req.body.username;
     user.name = req.body.name;
-    if (auth.checkIsAdmin(req.user.role)) {
+    if (auth.checkIsAdmin(user.role)) {
       user.role = req.body.role;
     }
     user.email = req.body.email;

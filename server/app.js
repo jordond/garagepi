@@ -55,7 +55,7 @@ function setupServer() {
   var server = require('http').createServer(app);
   var socketio = require('socket.io')(server, {
     serveClient: (config.env === 'production') ? true : true,
-    path: '/socket.io-client'
+    path: '/sync'
   });
 
   app.set('config', config);

@@ -17,7 +17,7 @@ if (config.secureApi) {
 router.get('/roles', controller.roles);
 router.post('/', auth.hasRole('admin'), controller.create);
 router.get('/:id', auth.hasRole('admin'), controller.show);
-router.put('/:id', auth.isMeOrHasRole('admin'), controller.update)
+router.put('/:id', auth.isMeOrHasRole('admin'), controller.update);
 router.put('/:id/password', auth.isMeOrHasRole('admin'), controller.changePassword);
 
 module.exports = router;

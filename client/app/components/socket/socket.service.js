@@ -16,9 +16,9 @@
     .module('components')
     .service('Socket', Socket);
 
-  Socket.$injector = ['$q', '$cookieStore', 'io', '_', 'socketFactory', 'AuthEvent', 'logger'];
+  Socket.$injector = ['$window', '$q', '$cookieStore', 'io', '_', 'socketFactory', 'AuthEvent', 'logger'];
 
-  function Socket($q, $cookieStore, io, _, socketFactory, AuthEvent, logger) {
+  function Socket($window, $q, $cookieStore, io, _, socketFactory, AuthEvent, logger) {
     var TAG = 'Socket'
       , self = this
       , ready
@@ -223,7 +223,7 @@
      */
     function connect() {
       var token = $cookieStore.get('token')
-        , path = '/socket.io-client'
+        , path = $window.location.pathname + 'sync'
         , socket
         , deferred = $q.defer();
 

@@ -13,7 +13,7 @@
     .factory('User', userConfig);
 
   function userConfig($resource) {
-    return $resource('/api/users/:id/:controller', {
+    return $resource('api/users/:id/:controller', {
       id: '@_id'
     },
     {
