@@ -29,4 +29,4 @@ function preLoad() {
 exports.load = function () {
   preLoad();
   return SEED_OPTIONS;
-}
+};

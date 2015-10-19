@@ -24,7 +24,7 @@ module.exports = {
       name: { type: "string", minLength: 2, title: "Name", description: "Name or alias" },
       title: {
         type: "string",
-        enum: ['dr','jr','sir','mrs','mr','NaN','dj']
+        enum: ['dr', 'jr', 'sir', 'mrs', 'mr', 'NaN', 'dj']
       }
     }
   },
@@ -38,4 +38,4 @@ module.exports = {
   model: {
     createdAt: new Date()
   }
-}
+};

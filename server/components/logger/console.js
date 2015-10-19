@@ -17,7 +17,7 @@ function Logger(tag) {
 
 Logger.prototype.verbose = function (message, data) {
   this.toLog('verbose', message, data);
-}
+};
 
 Logger.prototype.debug = function (message, data) {
   var bg = chalk.magenta;
@@ -58,12 +58,12 @@ Logger.prototype.toLog = function (type, message, data, tyCol, tagCol, msgCol) {
     type = '[' + type.toUpperCase() + ']';
     data = data ? data : '';
     if (tyCol && tagCol && msgCol) {
-      console.log(chalk.dim(timestamp()) + tyCol(type) + tagCol(this.tag) + msgCol(message) + data );
+      console.log(chalk.dim(timestamp()) + tyCol(type) + tagCol(this.tag) + msgCol(message) + data);
     } else {
       console.log(chalk.dim(timestamp()) + type + this.tag + message + data);
     }
   }
-}
+};
 
 /**
  * Private Helpers

@@ -30,9 +30,12 @@
     return directive;
 
     /** @ngInject */
-    function CtrlFunct() {
+    function CtrlFunct(pinData) {
       var vm = this;
       vm.name = 'gpioCard';
+      pinData.activate().then(function (data) {
+        vm.gpios = data;
+      });
     }
   }
 }());

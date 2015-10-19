@@ -16,7 +16,7 @@
   function pinDataConfig($q, $http, logger, Socket) {
     var service
       , pins
-      , apiBase = '/api/gpios/';
+      , apiBase = 'api/gpios/';
 
     service = {
       activate: activate,
@@ -56,9 +56,12 @@
      * @return {Array} list of all pins
      */
     function queryAll() {
-      return $http.get(apiBase)
+      var promise = $http
+        .get(apiBase)
         .then(success)
         .catch(failed);
+
+      return promise;
 
       function success(response) {
         logger.log('PinsData', 'Retrieved all pins');
@@ -73,7 +76,7 @@
 
     /**
      * Toggle an output pin
-     * pin: _id, name, output {}, input {}
+     * pin: id, name, output {}, input {}
      * @param {Object} pin contains pin info
      * @return {Boolean} toggle status
      */

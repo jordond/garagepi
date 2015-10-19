@@ -90,9 +90,9 @@ UserSchema
   .validate(function (value, respond) {
     var self = this;
     this.constructor.findOne({email: value}, function (err, user) {
-      if(err) throw err;
-      if(user) {
-        if(self.id === user.id) return respond(true);
+      if (err) { throw err; }
+      if (user) {
+        if (self.id === user.id) { return respond(true); }
         return respond(false);
       }
       respond(true);
@@ -112,9 +112,9 @@ UserSchema
   .validate(function (value, respond) {
     var self = this;
     this.constructor.findOne({username: value}, function (err, user) {
-      if(err) throw err;
+      if (err) { throw err; }
       if(user) {
-        if(self.id === user.id) return respond(true);
+        if (self.id === user.id) { return respond(true); }
         return respond(false);
       }
       respond(true);
@@ -130,12 +130,14 @@ var validatePresenceOf = function(value) {
  */
 UserSchema
   .pre('save', function (next) {
-    if (!this.isNew) return next();
+    if (!this.isNew) { return next(); }
 
-    if (!validatePresenceOf(this.hashedPassword))
+    if (!validatePresenceOf(this.hashedPassword)) {
       next(new Error('Invalid password'));
-    else
+    }
+    else {
       next();
+    }
   });
 
 /**
@@ -171,7 +173,7 @@ UserSchema.methods = {
    * @api public
    */
   encryptPassword: function (password) {
-    if (!password || !this.salt) return '';
+    if (!password || !this.salt) { return ''; }
     var salt = new Buffer(this.salt, 'base64');
     return crypto.pbkdf2Sync(password, salt, 10000, 64).toString('base64');
   }

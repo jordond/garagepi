@@ -37,16 +37,16 @@ module.exports = function(app) {
       }
     });
     app.use(express.static(path.join(config.root, 'client')));
-    app.use('/', express.static(path.join(config.client, 'client')));
+    app.use(config.webDir, express.static(path.join(config.client, 'client')));
     app.set('appPath', config.root + '/client');
     app.use(
       morgan('combined', {
-        skip: function (req, res) { return res.statusCode < 400 }
+        skip: function (req, res) { return res.statusCode < 400; }
       }));
   }
   if ('development' === env || 'test' === env) {
     app.use(express.static(path.join(config.root, 'client')));
-    app.use('/', express.static(path.join(config.client, 'client')));
+    app.use(config.webDir, express.static(path.join(config.client, 'client')));
     app.set('appPath', config.root + '/client');
     app.use(morgan('dev'));
     app.use(errorHandler()); // Error handler - has to be last

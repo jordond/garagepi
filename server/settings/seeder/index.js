@@ -22,6 +22,7 @@ var seeder = require('./seeder');
  */
 exports.seeder = function (finished) {
   var normalizedPath = path.join(__dirname, 'seeds');
+  finished = finished || function () { return true; };
 
   var acceptableSeedSettings = [false, true, 'override'];
   if (acceptableSeedSettings.indexOf(config.seedDB) === -1) {
@@ -42,7 +43,7 @@ exports.seeder = function (finished) {
     try {
       seeder.start(file, config, seederCallback);
     } catch (err) {
-      log.error('Failed to load seed file [' + file +']', err);
+      log.error('Failed to load seed file [' + file + ']', err);
     }
   });
 
@@ -67,4 +68,4 @@ exports.seeder = function (finished) {
       finished();
     }
   }
-}
+};

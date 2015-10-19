@@ -24,6 +24,8 @@ var all = {
 
   api: path.normalize(__dirname + '/../api'),
 
+  webDir: '/',
+
   // Server port
   port: process.env.PORT || 9000,
 

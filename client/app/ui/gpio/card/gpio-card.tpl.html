@@ -4,7 +4,11 @@
       <h2>Controls</h2>
     </div>
     <div class="card-action">
-
+      <div ng-repeat="pair in vm.gpios">
+        <span>name: {{pair.name}}</span>
+        <span>output: {{pair.output}}</span>
+        <span>input: {{pair.input}}</span>
+      </div>
     </div>
   </div>
 </div>

@@ -39,6 +39,7 @@
         .then(onActivated)
         .catch(function () {
           logger.warning('Camera feed failed to activate', '', 'Problem Occurred');
+          vm.feed = Feed.data;
         });
 
       function onActivated() {
