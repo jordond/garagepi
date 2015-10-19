@@ -10,7 +10,6 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 var express = require('express');
 var mongoose = require('mongoose');
 var config = require('./config');
-var gpio = require('./components/gpio');
 var log = require('./components/logger').console('App');
 
 // Check logger level
@@ -65,11 +64,7 @@ function setupServer() {
 
   // Seed database then initalize the gpio class
   if(config.seedDB) {
-    require('./settings/seeder').seeder(function () {
-      gpio.init();
-    });
-  } else {
-    gpio.init();
+    require('./settings/seeder').seeder();
   }
 
   // Setup server routes and start server
@@ -92,7 +87,6 @@ function setupServer() {
 
 function gracefulExit() {
   log.log('Triggering application shutdown');
-  gpio.close();
   mongoose.connection.close(function () {
     log.log('Closing connection to the database');
     process.exit(0);
@@ -100,7 +94,7 @@ function gracefulExit() {
 }
 
 function finish(code, err) {
-  var message = 'Node is about to exit with code [' + code + ']'
+  var message = 'Node is about to exit with code [' + code + ']';
   if (code === 0) {
     log.log(message);
   } else {

@@ -4,21 +4,17 @@
 
 'use strict';
 
-var Gpio = require('./gpio.model');
+var GpioList = require('./gpio.interface').list;
 
 exports.register = function (socket) {
-  Gpio.schema.post('save', function (doc) {
+  GpioList.on('save', function (doc) {
     onSave(socket, doc);
   });
-  Gpio.schema.post('remove', function (doc) {
-    onRemove(socket, doc);
+  GpioList.on('toggle', function (doc) {
+    onSave(socket, doc);
   });
 };
 
 function onSave(socket, doc, cb) {
   socket.emit('gpio:save', doc);
-}
-
-function onRemove(socket, doc, cb) {
-  socket.emit('gpio:remove', doc);
 }

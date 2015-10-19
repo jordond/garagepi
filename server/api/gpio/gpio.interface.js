@@ -1,14 +1,15 @@
 'use strict';
 
 var Gpio = require('onoff').Gpio;
-var GpioModel = require('../../api/gpio/gpio.model');
-var log = require('../logger/').console('Gpio');
+var GpioList = require('./gpioList');
+var log = require('../../components/logger/').console('Gpio');
 
 var pins = [];
 var wasError = false;
 var errors = 0;
 
 var service = {
+  list: GpioList,
   pins: pins,
   init: initialize,
   toggle: toggle,
@@ -27,8 +28,7 @@ module.exports = service;
  * using 'onoff'.
  */
 function initialize() {
-  GpioModel.find(function (err, gpios) {
-    if (err) { return handleError(err); }
+  GpioList.find(function (gpios) {
     if (!gpios.length) {
       log.warn('No pins were found');
       return;
@@ -96,18 +96,18 @@ function handleError(err, message) {
  * @param  {Object} gpio Pin pair containing the input and output pins
  */
 function setupPins(gpio) {
-  var sensor = createPin(gpio.input, 600);
+  var sensor = createPin(gpio.input, 100);
   var door = createPin(gpio.output, 600);
   if (sensor) {
     sensor.read(function (err, value) {
       if (err) { return handleError(err); }
       log.debug('Reading ' + gpio.name + ' sensor\'s initial state, value [' + value + ']');
-      setSensorStatus(gpio.input, value);
+      setSensorStatus(gpio, value);
     });
     sensor.watch(function (err, value) {
       if (err) { return handleError(err); }
       log.info(gpio.name + ' sensor changed, value [' + value + ']');
-      setSensorStatus(gpio.input, value, true);
+      setSensorStatus(gpio, value);
     });
   }
   if (door) {
@@ -151,18 +151,13 @@ function createPin(settings, debounce) {
 
 /**
  * Save the sensor pins state to the database
- * @param {Object}  input   Sensor database object
+ * @param {Object}  gpio   Sensor database object
  * @param {Integer} value   Current value of the pin
- * @param {Boolean} showLog Display log message
  */
-function setSensorStatus(input, value, showLog) {
-  input.value = value === 1 ? true : false;
-  input.save(function (err) {
-    if (err) { return handleError(err); }
-    if (showLog) {
-      log.verbose('Sensor status was saved');
-    }
-  });
+function setSensorStatus(gpio, value) {
+  gpio.input.value = value === 1 ? true : false;
+  log.verbose('VALUE: ' + value);
+  gpio.save();
 }
 
 /**
