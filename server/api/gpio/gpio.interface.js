@@ -52,13 +52,8 @@ function initialize() {
  * @return {Function}          The callback
  */
 function toggle(pin, callback) {
-  var toggled = false;
-  if (pin && pin.door) {
-    log.info('Toggling [' + pin.name + '] door');
-    writeOutput(pin.door);
-    toggled = true;
-  }
-  return callback(toggled);
+  log.info('Toggling [' + pin.name + '] door');
+  writeOutput(pin.door, callback);
 }
 
 /**
@@ -84,7 +79,7 @@ function handleError(err, message) {
   wasError = true;
   errors++;
   log.error(message || err.message || 'Generic error');
-  return log.verbose(err);
+  return log.debug(err);
 }
 
 /**
@@ -175,16 +170,23 @@ function unexportPin(pin) {
  * Toggle the door pin, turn off, wait a bit, then turn
  * the pin back on
  * @param  {Object} output Pin object
+ * @param {Function} callback send toggled status
  */
-function writeOutput(output) {
+function writeOutput(output, callback) {
   if (output) {
     output.write(0, function (err) {
-      if (err) { return handleError(err); }
+      if (err) {
+        handleError(err);
+        callback(err, false);
+      }
       setTimeout(function() {
         output.write(1);
       }, 200);
+      callback(null, true);
     });
   } else {
-    log.warn('Output pin isn\'t set, not writing');
+    var error = 'Output pin was not exported, see logs';
+    log.warn(error);
+    callback(error, false);
   }
 }

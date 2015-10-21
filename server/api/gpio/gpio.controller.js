@@ -20,8 +20,12 @@ exports.index = function (req, res) {
 exports.toggle = function (req, res) {
   Gpio.list.findById(req.params.id, function (gpio) {
     if (!gpio) { return res.sendStatus(404); }
-    Gpio.toggle(gpio, function (toggled) {
-      return res.status(200).json({toggled: toggled});
+    Gpio.toggle(gpio, function (err, toggled) {
+      var json = {
+        toggled: toggled,
+        error: err
+      };
+      return res.status(toggled ? 200 : 500).json(json);
     });
   });
 };

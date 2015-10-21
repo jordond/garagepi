@@ -37,8 +37,8 @@ module.exports = {
       target_dir     : '/var/tmp/motion',
       rotate         : 0,
       quality        : 60,
-      width          : 640,
-      height         : 480,
+      width          : 320,
+      height         : 240,
       vfl2_palette   : 8,
       auto_brightness: 'off',
       brightness     : 0,
@@ -47,4 +47,4 @@ module.exports = {
       hue            : 0
     }
   }
-}
+};

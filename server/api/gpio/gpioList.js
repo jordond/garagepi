@@ -2,6 +2,7 @@
 
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
+var _ = require('lodash');
 
 var GpioModel = require('./gpio.model');
 var pins = require('../../settings/pins');
@@ -40,13 +41,8 @@ GpioList.prototype.find = function (fn) {
  * @return callback
  */
 GpioList.prototype.findById = function (id, fn) {
-  var gpio;
-  this.gpios.forEach(function (value) {
-    if (value.id === id) {
-      gpio = value;
-    }
-  });
-  return fn(gpio);
+  var gpio = _.findWhere(this.gpios, { _id: id });
+  fn(gpio);
 };
 
 module.exports = new GpioList();

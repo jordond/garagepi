@@ -76,12 +76,12 @@
 
     /**
      * Toggle an output pin
-     * pin: id, name, output {}, input {}
+     * pin: _id, name, output {}, input {}
      * @param {Object} pin contains pin info
      * @return {Boolean} toggle status
      */
     function togglePin(pin) {
-      return $http.get(apiBase + pin.id)
+      return $http.get(apiBase + pin._id)
         .then(success)
         .catch(failed);
 

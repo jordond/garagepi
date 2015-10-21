@@ -30,12 +30,24 @@
     return directive;
 
     /** @ngInject */
-    function CtrlFunct(pinData) {
+    function CtrlFunct(pinData, logger) {
       var vm = this;
-      vm.name = 'gpioCard';
-      pinData.activate().then(function (data) {
-        vm.gpios = data;
-      });
+      vm.toggle = toggle;
+
+      activate();
+
+      function activate() {
+        pinData.activate().then(function (data) {
+          vm.gpios = data;
+          logger.log('GPIO Card activated');
+        });
+      }
+
+      function toggle(pinPair) {
+        pinData.toggle(pinPair).then(function (data) {
+          // Toggle was successful
+        });
+      }
     }
   }
 }());
