@@ -21,7 +21,7 @@
   function pinToggleConfig() {
     var directive = {
       scope: {
-        pin: '=',
+        status: '=',
         toggle: '&?',
         upIcon: '@?',
         downIcon: '@?'

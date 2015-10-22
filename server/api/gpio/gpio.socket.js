@@ -4,13 +4,13 @@
 
 'use strict';
 
-var GpioList = require('./gpio.interface').list;
+var Gpio = require('./gpioList');
 
 exports.register = function (socket) {
-  GpioList.on('save', function (doc) {
+  Gpio.on('save', function (doc) {
     onSave(socket, doc);
   });
-  GpioList.on('toggle', function (doc) {
+  Gpio.on('toggle', function (doc) {
     onSave(socket, doc);
   });
 };

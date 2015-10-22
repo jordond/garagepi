@@ -5,8 +5,9 @@
     </div>
     <div class="card-action">
       <div ng-repeat="pair in vm.gpios">
+        <h4>{{ pair.name }}</h4>
         <pin-toggle
-          pin="pair"
+          status="pair.input.value"
           toggle="vm.toggle(pair)">
         </pin-toggle>
       </div>
