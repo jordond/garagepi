@@ -1,36 +1,25 @@
 'use strict';
 
-var EventEmitter = require('events').EventEmitter;
-var util = require('util');
 var _ = require('lodash');
 
-var GpioModel = require('./gpio.model');
+var Gpio = require('./gpio.model');
 var pins = require('../../settings/pins');
 var log = require('../../components/logger/').console('Gpio');
 
-var gpioList = new GpioList();
-
-module.exports = gpioList;
-
+/**
+ * @constuctor GpioList
+ * Contains a list of all the gpio models, inherits from
+ * eventemitter so it can broadcast events
+ */
 function GpioList() {
-  EventEmitter.call(this);
-
-  var gpios = [], self = this;
+  var gpios = [];
   pins.forEach(function (value) {
     log.info('Exporting [' + value.name + ']');
-    var model = new GpioModel(value, self.emit);
+    var model = new Gpio.Model(value);
     gpios.push(model);
   });
   this.gpios = gpios;
-
-  var self = this;
-  function onEvent(event, model) {
-    console.log(self);
-    self.emit(event, model);
-  }
 }
-
-util.inherits(GpioList, EventEmitter);
 
 /**
  * Get the array of pins
@@ -60,3 +49,5 @@ GpioList.prototype.close = function () {
     gpio.close();
   });
 };
+
+module.exports = new GpioList();
