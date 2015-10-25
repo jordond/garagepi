@@ -8,8 +8,11 @@ var OnOff = require('onoff').Gpio;
 
 var log = require('../../components/logger').console('GpioModel');
 
-var OUTPUT_CLOSE = 0;
-var OUTPUT_OPEN = 1;
+var GPIO_CLOSE = 0
+  , GPIO_OPEN = 1
+  , GPIO_TOGGLE_TIMEOUT = 200
+  , GPIO_DEBOUNCE_DEFAULT = 100
+  , GPIO_DEBOUNCE_OUTPUT = 600;
 
 /**
  * Constructor, attatch event emitter
@@ -57,9 +60,9 @@ function initInput(model) {
 }
 
 function initOutput(model) {
-  var output = createPin(model.output, 600);
+  var output = createPin(model.output, GPIO_DEBOUNCE_OUTPUT);
   if (output) {
-    output.write(1, function (err) {
+    output.write(GPIO_OPEN, function (err) {
       if (err) { return handleError(err); }
       log.debug('Writing ' + model.name + ' door\'s initial state to on');
     });
@@ -81,14 +84,14 @@ Model.prototype.toggle = function (callback) {
   var self = this;
   if (this.output.gpio) {
     log.info('Toggling [' + this.name + '] door');
-    this.output.gpio.write(OUTPUT_CLOSE, function (err) {
+    this.output.gpio.write(GPIO_CLOSE, function (err) {
       if (err) {
         handleError(err);
         callback(err, false);
       }
       setTimeout(function() {
-        self.output.gpio.write(OUTPUT_OPEN);
-      }, 200);
+        self.output.gpio.write(GPIO_OPEN);
+      }, GPIO_TOGGLE_TIMEOUT);
       callback(null, true);
       gpio.emit('toggle', this);
     });
@@ -115,7 +118,7 @@ function createPin(settings, debounce) {
         settings.pin,
         settings.deirection,
         settings.edge || 'none',
-        { debounceTimeout: debounce || 100 }
+        { debounceTimeout: debounce || GPIO_DEBOUNCE_DEFAULT }
       );
       log.debug('Exported pin #[' + settings.pin + '] direction [' + settings.direction + ']');
       return pin;

@@ -13,7 +13,7 @@ module.exports = [{
   input: {
     description: 'Van side open/closed sensor',
     pin: 22,
-    edge: 'rising',
+    edge: 'both',
     direction: 'in',
   },
   output: {
@@ -29,7 +29,7 @@ module.exports = [{
   input: {
     description: 'Car side open/closed sensor',
     pin: 25,
-    edge: 'rising',
+    edge: 'both',
     direction: 'in'
   },
   output: {

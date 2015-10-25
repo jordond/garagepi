@@ -9,8 +9,11 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 var express = require('express');
 var mongoose = require('mongoose');
+
 var config = require('./config');
 var log = require('./components/logger').console('App');
+
+var isExiting = false;
 
 // Check logger level
 var level = config.log.level.toUpperCase();
@@ -31,17 +34,19 @@ log.log('Attempting to connect to [' + config.mongo.uri + ']');
 mongoose.connection.on('connected', function () {
   log.log('Connected to ' + config.mongo.uri + ']');
   log.log('Kickstarting server setup');
+
+  mongoose.connection.on('disconnected', function () {
+    log.warn('Connection to database has been lost');
+    finish(1, 'Could not connect to database at [' + config.mongo.uri + ']');
+  });
+
   setupServer();
 });
 
 mongoose.connection.on('error', function (err) {
   log.error('Failed to connect to database: ', err.message);
   log.error('Connection to database failed, app will now terminate');
-  process.exit(1);
-});
-
-mongoose.connection.on('disconnected', function () {
-  log.warn('Connection to database has been lost');
+  finish(1, err);
 });
 
 /**
@@ -80,25 +85,29 @@ function setupServer() {
   process
     .on('SIGINT', gracefulExit)
     .on('SIGTERM', gracefulExit);
-    //.on('exit', finish);
 
   exports = module.exports = app;
 }
 
 function gracefulExit() {
   log.log('Triggering application shutdown');
+  mongoose.connection.removeAllListeners('disconnected');
   mongoose.connection.close(function () {
     log.log('Closing connection to the database');
-    process.exit(0);
+    finish(0);
   });
 }
 
 function finish(code, err) {
+  if (isExiting) {
+    return;
+  }
   var message = 'Node is about to exit with code [' + code + ']';
   if (code === 0) {
     log.log(message);
   } else {
-    log.error(message, err);
+    log.warn(message);
+    log.error('Error: ' + err);
   }
   process.exit(code);
 }
