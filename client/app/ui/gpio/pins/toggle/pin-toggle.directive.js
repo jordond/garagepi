@@ -21,7 +21,9 @@
   function pinToggleConfig() {
     var directive = {
       scope: {
+        name: '@',
         status: '=',
+        error: '=?',
         toggle: '&?',
         upIcon: '@?',
         downIcon: '@?'
@@ -39,8 +41,8 @@
     /** @ngInject */
     function CtrlFunct(logger) {
       var vm = this;
-      vm.upIcon = vm.upIcon || 'fa-long-arrow-up';
-      vm.downIcon = vm.downIcon || 'fa-long-arrow-down';
+      vm.upIcon = vm.upIcon || 'fa-arrow-up';
+      vm.downIcon = vm.downIcon || 'fa-arrow-down';
       vm.toggle = vm.toggle || defaultToggle;
 
       function defaultToggle() {

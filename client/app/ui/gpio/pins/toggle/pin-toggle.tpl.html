@@ -1,9 +1,24 @@
 <div class="toggle-container">
-  <div class="toggle-button btn"
-       ng-class="vm.status ? 'btn-success' : 'btn-danger'"
-       ng-click="vm.toggle()">
-    <i class="toggle-icon fa fa-3x"
-       ng-class="vm.status ? vm.downIcon : vm.upIcon">
-    </i>
+  <div class="toggle-button btn btn-block"
+       ng-class="vm.status ? 'btn-info' : 'btn-success'"
+       ng-click="vm.toggle()"
+       ng-disabled="vm.error.hasError">
+
+    <span class="toggle-name" ng-show="vm.name">
+      {{ ::vm.name }}
+    </span>
+
+    <div class="toggle-status" ng-hide="vm.error.hasError">
+      <i class="toggle-icon fa fa-3x"
+        ng-class="vm.status ? vm.downIcon : vm.upIcon">
+      </i>
+      <span>{{ vm.status ? 'Close' : 'Open' }}</span>
+    </div>
+
+    <div class="toggle-error" ng-show="vm.error.hasError">
+      <i class="toggle-icon fa fa-exclamation-triangle fa-3x"></i>
+      <span>Not available</span>
+    </div>
+
   </div>
 </div>

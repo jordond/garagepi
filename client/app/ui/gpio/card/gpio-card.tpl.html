@@ -1,13 +1,11 @@
 <div class="col-md-6">
   <div class="gpio-card-container card">
-    <div class="gpio-card-header">
-      <h2>Controls</h2>
-    </div>
-    <div class="card-action">
-      <div ng-repeat="pair in vm.gpios">
-        <h4>{{ pair.name }}</h4>
+    <div class="card-content">
+      <div ng-repeat="pair in vm.gpios" class="col-md-6">
         <pin-toggle
+          name="{{ ::pair.name }}"
           status="pair.input.value"
+          error="::pair.output.gpio.error"
           toggle="vm.toggle(pair)">
         </pin-toggle>
       </div>

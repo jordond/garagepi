@@ -1,16 +1,10 @@
 <div navbar></div>
 <div class='container'>
   <div class="row">
-    <div class="col-lg-6 col-md-6">
-      <h2>Video camera test</h2>
-    </div>
-  </div>
-  <div class="row">
     <gpio-card></gpio-card>
     <camera-view autostart="false"></camera-view>
   </div>
 
+  <br>
   <div class="btn btn-primary" ng-click="vm.refreshtoken()">refresh token</div>
-
-  <h2>logged in: {{ vm.loggedIn }}</h2>
 </div>

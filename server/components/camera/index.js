@@ -72,7 +72,7 @@ function setupCamera() {
       }
     } else {
       log.error('Video device [' + config.extra.videodevice + '] not found');
-      log.error('Connect device, next check in [' + pollSpeed + '] seconds');
+      log.info('Connect device, next check in [' + pollSpeed + '] seconds');
       if (canStream) {
         emit('camera:error', {
           error: {

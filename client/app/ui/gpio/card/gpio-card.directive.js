@@ -16,7 +16,7 @@
     .directive('gpioCard', gpioCardConfig);
 
   /** @ngInject */
-  function gpioCardConfig() {
+  function gpioCardConfig(pinData) {
     var directive = {
       scope: {},
       templateUrl: 'app/ui/gpio/card/gpio-card.tpl.html',
@@ -24,13 +24,14 @@
       replace: false,
       controller: CtrlFunct,
       controllerAs: 'vm',
-      bindToController: true
+      bindToController: true,
+      link: LinkFunct
     };
 
     return directive;
 
     /** @ngInject */
-    function CtrlFunct(pinData, logger) {
+    function CtrlFunct(logger) {
       var vm = this;
       vm.toggle = toggle;
 
@@ -39,15 +40,21 @@
       function activate() {
         pinData.activate().then(function (data) {
           vm.gpios = data;
-          logger.log('GPIO Card activated');
+          logger.log('GPIO', 'Card activated');
         });
       }
 
       function toggle(pinPair) {
-        pinData.toggle(pinPair).then(function (data) {
+        pinData.toggle(pinPair).then(function () {
           // Toggle was successful
         });
       }
+    }
+
+    function LinkFunct(scope) {
+      scope.$on('$destroy', function () {
+        pinData.deactivate();
+      });
     }
   }
 }());

@@ -44,7 +44,7 @@ module.exports.Model = Model;
 
 function initInput(model) {
   var input = createPin(model.input);
-  if (input) {
+  if (!input.error) {
     input.read(function (err, value) {
     if (err) { return handleError(err); }
       log.debug('Reading ' + model.name + ' sensor\'s initial state, value [' + value + ']');
@@ -61,7 +61,7 @@ function initInput(model) {
 
 function initOutput(model) {
   var output = createPin(model.output, GPIO_DEBOUNCE_OUTPUT);
-  if (output) {
+  if (!output.error) {
     output.write(GPIO_OPEN, function (err) {
       if (err) { return handleError(err); }
       log.debug('Writing ' + model.name + ' door\'s initial state to on');
@@ -82,7 +82,7 @@ function setSensorStatus(model, value) {
 
 Model.prototype.toggle = function (callback) {
   var self = this;
-  if (this.output.gpio) {
+  if (this.output.gpio && !this.output.gpio.error) {
     log.info('Toggling [' + this.name + '] door');
     this.output.gpio.write(GPIO_CLOSE, function (err) {
       if (err) {
@@ -96,8 +96,8 @@ Model.prototype.toggle = function (callback) {
       gpio.emit('toggle', this);
     });
   } else {
-    var error = 'Output pin was not exported, see logs';
-    log.warn(error);
+    var error = this.output.gpio.error.message || 'Output pin was not exported, see logs';
+    log.error('[toggle] ' + error);
     callback(error, false);
   }
 };
@@ -124,7 +124,7 @@ function createPin(settings, debounce) {
       return pin;
   } catch (err) {
     handleError(err);
-    return false;
+    return { error: { hasError: true, message: err} };
   }
 }
 

@@ -46,8 +46,9 @@
         pins = [];
       }
 
-      function notify() {
-        logger.log('PinsData', 'Receieved notify from promise');
+      function notify(data) {
+        var status = (data.item.input.value || false) ? 'open' : 'closed';
+        logger.log('PinsData', data.item.name + ' is ' + status);
       }
     }
 
@@ -86,7 +87,7 @@
         .catch(failed);
 
       function success(response) {
-        logger.log('PinsData', 'Pin [' + pin.name + '] toggled' + response);
+        logger.log('PinsData', 'Pin [' + pin.name + '] toggled');
         return response;
       }
 
