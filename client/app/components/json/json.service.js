@@ -12,6 +12,7 @@
     .module('components')
     .service('JsonService', Json);
 
+  /** @ngInject */
   function Json($http, $log, _) {
     var self = this
     , jsonDir = 'json/'

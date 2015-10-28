@@ -12,6 +12,7 @@
     .module('components')
     .factory('io', io);
 
+  /** @ngInject */
   function io($window) {
     return $window.io;
   }

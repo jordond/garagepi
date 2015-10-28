@@ -12,6 +12,7 @@
     .module('app.account')
     .controller('LogoutCtrl', LogoutCtrl);
 
+  /** @ngInject */
   function LogoutCtrl($state, Auth) {
     var vm = this;
 

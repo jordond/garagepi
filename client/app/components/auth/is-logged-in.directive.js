@@ -14,6 +14,7 @@
     .module('components')
     .directive('isLoggedIn', isLoggedIn);
 
+  /** @ngInject */
   function isLoggedIn(Auth) {
     return {
       restrict: 'A',

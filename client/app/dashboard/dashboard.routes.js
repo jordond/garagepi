@@ -5,6 +5,7 @@
     .module('app.dashboard')
     .config(config);
 
+  /** @ngInject */
   function config($stateProvider) {
     $stateProvider
       .state('dashboard', {

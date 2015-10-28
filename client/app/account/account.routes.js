@@ -5,6 +5,7 @@
     .module('app.account')
     .config(config);
 
+  /** @ngInject */
   function config($stateProvider) {
     $stateProvider
       .state('login', {

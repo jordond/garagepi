@@ -12,6 +12,7 @@
     .module('components')
     .factory('User', userConfig);
 
+  /** @ngInject */
   function userConfig($resource) {
     return $resource('api/users/:id/:controller', {
       id: '@_id'

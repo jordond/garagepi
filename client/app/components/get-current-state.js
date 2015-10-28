@@ -14,6 +14,7 @@
     .module('components')
     .directive('getCurrentState', getCurrentState);
 
+  /** @ngInject */
   function getCurrentState($location, Auth) {
     return {
       restrict: 'A',

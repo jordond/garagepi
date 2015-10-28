@@ -24,18 +24,12 @@
       },
       templateUrl: 'app/components/user/form/user-form.tpl.html',
       replace: false,
-      link: linkFunct,
       controller: UserFormCtrl,
       controllerAs: 'vm',
       bindToController: true
     };
 
     return directive;
-
-    function linkFunct(scope, element, attrs) {
-      /*jshint unused:false */
-      /*eslint "no-unused-vars": [2, {"args": "none"}]*/
-    }
   }
 
   UserFormCtrl.$injector = ['Auth', 'roles', 'toastr'];

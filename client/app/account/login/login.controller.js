@@ -12,6 +12,7 @@
     .module('app.account')
     .controller('LoginCtrl', LoginCtrl);
 
+  /** @ngInject */
   function LoginCtrl($location, Auth) {
     var vm = this
       , user = {};
@@ -28,6 +29,7 @@
       }
     }
 
+    /** @ngInject */
     function login(userDetails) {
       return Auth.login(userDetails)
         .then(function (token) {

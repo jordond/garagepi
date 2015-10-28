@@ -5,6 +5,7 @@
     .module('app.system.users')
     .config(config);
 
+  /** @ngInject */
   function config($stateProvider) {
     $stateProvider
       .state('system.users', {
