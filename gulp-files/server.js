@@ -50,8 +50,11 @@ module.exports = function(gulp, $, config) {
   });
 
   gulp.task('copy-config', ['clean-server', 'server-copy'], function () {
-    return gulp.src(['*' + config.localEnvFile, '*.json'])
-      .pipe(gulp.dest(config.localEnvDest));
+    return gulp.src([
+      '*' + config.localEnvFile,
+      '*.json',
+      '!tsd.json'
+    ]).pipe(gulp.dest(config.localEnvDest));
   });
 
   // run the nodemon
