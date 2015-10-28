@@ -10,9 +10,8 @@ var log = require('../../components/logger').console('GpioModel');
 
 var GPIO_CLOSE = 0
   , GPIO_OPEN = 1
-  , GPIO_TOGGLE_TIMEOUT = 200
-  , GPIO_DEBOUNCE_DEFAULT = 100
-  , GPIO_DEBOUNCE_OUTPUT = 600;
+  , GPIO_TOGGLE_TIMEOUT = 300
+  , GPIO_DEBOUNCE_DEFAULT = 100;
 
 /**
  * Constructor, attatch event emitter
@@ -31,8 +30,10 @@ function Model(settings) {
   _.extend(this, settings);
 
   // Initialization
-  if (this.input && this.output) {
+  if (this.type.pair) {
     this.input.gpio = initInput(this);
+    this.output.gpio = initOutput(this);
+  } else if (this.type.single) {
     this.output.gpio = initOutput(this);
   } else {
     handleError(this, 'Objects input, or output is undefined');
@@ -46,12 +47,12 @@ function initInput(model) {
   var input = createPin(model.input);
   if (!input.error) {
     input.read(function (err, value) {
-    if (err) { return handleError(err); }
+    if (err) { return handleError(err, 'Reading pin ' + model.input.pin); }
       log.debug('Reading ' + model.name + ' sensor\'s initial state, value [' + value + ']');
       setSensorStatus(model, value);
     });
     input.watch(function (err, value) {
-      if (err) { return handleError(err); }
+      if (err) { return handleError(err, 'Watch pin ' + model.input.pin); }
       log.info(model.name + ' sensor changed, value [' + value + ']');
       setSensorStatus(model, value);
     });
@@ -60,10 +61,10 @@ function initInput(model) {
 }
 
 function initOutput(model) {
-  var output = createPin(model.output, GPIO_DEBOUNCE_OUTPUT);
+  var output = createPin(model.output);
   if (!output.error) {
     output.write(GPIO_OPEN, function (err) {
-      if (err) { return handleError(err); }
+      if (err) { return handleError(err, 'Writing pin ' + model.output.pin); }
       log.debug('Writing ' + model.name + ' door\'s initial state to on');
     });
   }
@@ -86,10 +87,11 @@ Model.prototype.toggle = function (callback) {
     log.info('Toggling [' + this.name + '] door');
     this.output.gpio.write(GPIO_CLOSE, function (err) {
       if (err) {
-        handleError(err);
+        handleError(err, 'Toggle pin ' + self.output.pin);
         callback(err, false);
       }
-      setTimeout(function() {
+      setTimeout(function () {
+        log.verbose('Inside timeout function writing 1');
         self.output.gpio.write(GPIO_OPEN);
       }, GPIO_TOGGLE_TIMEOUT);
       callback(null, true);
@@ -103,35 +105,36 @@ Model.prototype.toggle = function (callback) {
 };
 
 Model.prototype.close = function () {
-  this.emit('close', this);
-  unexport(this.input.gpio);
-  unexport(this.output.gpio);
+  log.verbose('Closing pin [' + this.name + ']');
+  gpio.emit('close', this);
+  unexport(this.input);
+  unexport(this.output);
 };
 
 /**
  * Privates
  */
 
-function createPin(settings, debounce) {
+function createPin(settings) {
   try {
     var pin = new OnOff(
         settings.pin,
-        settings.deirection,
+        settings.direction,
         settings.edge || 'none',
-        { debounceTimeout: debounce || GPIO_DEBOUNCE_DEFAULT }
+        { debounceTimeout: settings.debounce || GPIO_DEBOUNCE_DEFAULT }
       );
       log.debug('Exported pin #[' + settings.pin + '] direction [' + settings.direction + ']');
       return pin;
   } catch (err) {
-    handleError(err);
+    handleError(err, 'Exporting pin [' + settings.pin + '] failed');
     return { error: { hasError: true, message: err} };
   }
 }
 
-function unexport(gpio) {
-  if (gpio) {
-    gpio.unexport();
-    log.info('Unexported pin #[' + gpio + ']');
+function unexport(model) {
+  if (model && !model.gpio.error) {
+    model.gpio.unexport();
+    log.info('Unexported pin [' + model.pin + ']');
   }
 }
 

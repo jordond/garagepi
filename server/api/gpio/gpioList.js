@@ -45,6 +45,7 @@ GpioList.prototype.findById = function (id, fn) {
  * Close all of the exported gpio objects
  */
 GpioList.prototype.close = function () {
+  log.verbose('Closing all pins');
   this.gpios.forEach(function (gpio) {
     gpio.close();
   });

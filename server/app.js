@@ -94,6 +94,7 @@ function gracefulExit() {
   mongoose.connection.removeAllListeners('disconnected');
   mongoose.connection.close(function () {
     log.log('Closing connection to the database');
+    require('./api/gpio/gpioList').close();
     finish(0);
   });
 }
