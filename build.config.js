@@ -36,7 +36,7 @@ module.exports = {
 
   // deploy options
   root: 'garage-pi',
-  hostname: 'merlin',
+  hostname: 'garage',
   username: 'pi',
   port: 22,
   destination: '/opt/garagepi',

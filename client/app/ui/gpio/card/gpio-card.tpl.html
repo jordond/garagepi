@@ -1,7 +1,7 @@
 <div class="col-md-6">
   <div class="gpio-card-container card">
     <div class="card-content">
-      <div ng-repeat="pair in vm.gpios" class="col-md-6">
+      <div ng-repeat="pair in vm.gpios" class="pair col-md-6 col-sm-6">
         <pin-toggle
           name="{{ ::pair.name }}"
           status="pair.input.value"

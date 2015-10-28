@@ -1,6 +1,5 @@
 @import (reference) "../../bower_components/bootstrap/less/bootstrap";
 @import "../../bower_components/animate.less/animate.less";
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:300);
 @bgDefault      : #34495e;
 @bgHighlight    : #34495e;
 @colDefault     : #ecf0f1;
@@ -15,6 +14,21 @@
 
 @bgWhite        : #FFFFFF;
 @bgGrey         : #BDC3C7;
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 300;
+  font-style: normal;
+  src: url("../../fonts/Open-Sans-300.eot");
+  src: url("../../fonts/Open-Sans-300.eot?#iefix") format("embedded-opentype"),
+       local("Open Sans Light"),
+       local("Open-Sans-300"),
+       url("../../fonts/Open-Sans-300.woff2") format("woff2"),
+       url("../../fonts/Open-Sans-300.woff") format("woff"),
+       url("../../fonts/Open-Sans-300.ttf") format("truetype"),
+       url("../../fonts/Open-Sans-300.svg#OpenSans") format("svg");
+}
+
 
 html, body {
   font-family: 'Open Sans', sans-serif !important;

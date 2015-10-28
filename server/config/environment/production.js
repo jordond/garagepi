@@ -25,7 +25,7 @@ module.exports = {
   secureApi: true,
 
   camera: {
-    shutdownDelay: 5
+    shutdownDelay: 15
   },
 
   token: {
