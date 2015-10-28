@@ -6,7 +6,8 @@
  *
  */
 
-module.exports = [{
+module.exports = [
+  {
     _id: 'van',
     type: { pair: [17, 6] },
     name: 'Van',
@@ -42,13 +43,5 @@ module.exports = [{
       direction: 'out',
       debounce: 200
     }
-  }, {
-    _id: 'led',
-    type: { single: 5 },
-    name: 'Status LED',
-    output: {
-      description: 'Displays the status of the server',
-      pin: 5,
-      direction: 'out'
-    }
-}];
+  }
+];
