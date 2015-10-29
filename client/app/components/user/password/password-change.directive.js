@@ -33,7 +33,6 @@
 
     return directive;
 
-
     /** @ngInject */
     function CtrlFunct($scope, $modal, Auth) {
       var vm = this

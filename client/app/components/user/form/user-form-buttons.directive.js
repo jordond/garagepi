@@ -25,22 +25,15 @@
       },
       templateUrl: 'app/components/user/form/user-form-buttons.tpl.html',
       replace: false,
-      link: linkFunct,
       controller: UserFormButtonsCtrl,
       controllerAs: 'vm',
       bindToController: true
     };
 
     return directive;
-
-    function linkFunct(scope, element, attrs) {
-      /*jshint unused:false */
-      /*eslint "no-unused-vars": [2, {"args": "none"}]*/
-    }
   }
 
-  UserFormButtonsCtrl.$injector = ['$log', 'UserData'];
-
+  /** @ngInject */
   function UserFormButtonsCtrl($log, UserData) {
     var vm = this;
 

@@ -32,8 +32,7 @@
     return directive;
   }
 
-  UserFormCtrl.$injector = ['Auth', 'roles', 'toastr'];
-
+  /** @ngInject */
   function UserFormCtrl(Auth, roles, toastr) {
     var vm = this
       , currentUserID = Auth.getUser()._id;

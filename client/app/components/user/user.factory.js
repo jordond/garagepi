@@ -10,10 +10,10 @@
    */
   angular
     .module('components')
-    .factory('User', userConfig);
+    .factory('User', UserConfig);
 
-  /** @ngInject */
-  function userConfig($resource) {
+  UserConfig.$injector = ['$resource'];
+  function UserConfig($resource) {
     return $resource('api/users/:id/:controller', {
       id: '@_id'
     },

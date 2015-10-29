@@ -31,10 +31,12 @@
     .config(config)
     .run(run);
 
+  /** @ngInject */
   function config($httpProvider) {
     $httpProvider.interceptors.push('authInterceptor');
   }
 
+  /** @ngInject */
   function run($rootScope, $state, roles, Auth, AuthEvent, Socket, Token, logger) {
     if (Token.has()) {
       Auth.getSelf()
