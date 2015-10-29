@@ -99,7 +99,9 @@
             logger.log(TAG, 'Camera feed not available Error: ' + info.error.message);
             data.error.hasError = true;
             data.error.message = info.error.message;
+            return $q.reject();
           }
+          return $q.resolve();
         })
         .catch(function (err) {
           logger.log(TAG, 'Activate failed: ' + err);

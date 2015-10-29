@@ -23,6 +23,8 @@
       , self = this
       , ready
       , isRefreshing
+      , deferredEmit = []
+      , deferredRegister = []
       , refreshEvents = []
       , registeredModels = [];
 
@@ -130,12 +132,18 @@
     function emit(event, data, callback) {
       if (angular.isDefined(self.wrapper)) {
         self.wrapper.emit(event, data, callback);
+      } else {
+        log('Failed to emit [' + event + '] deferring event');
+        deferredEmit.push({event: event, data: data, fn: callback});
       }
     }
 
     function registerEvent(event, callback) {
       if (angular.isDefined(self.wrapper)) {
         self.wrapper.addListener(event, callback);
+      } else {
+        log('Failed to register [' + event + '] wrapper not ready');
+        deferredRegister.push({event: event, fn: callback});
       }
     }
 
@@ -234,6 +242,7 @@
       });
 
       self.wrapper = socketFactory({ioSocket: socket});
+      addDeferred();
 
       socket.on('connect', function () {
         self.wrapper.socket(socket);
@@ -244,6 +253,17 @@
       registerSocketEvents(socket);
 
       return deferred.promise;
+    }
+
+    function addDeferred() {
+      deferredEmit.forEach(function (item) {
+        self.wrapper.emit(item.event, item.data, item.fn);
+      });
+      deferredEmit = [];
+      deferredRegister.forEach(function (item) {
+        self.wrapper.addListener(item.event, item.fn);
+      });
+      deferredRegister = [];
     }
 
     /**

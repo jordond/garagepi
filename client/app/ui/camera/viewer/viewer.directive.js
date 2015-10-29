@@ -35,16 +35,21 @@
     function ViewerCtrl() {
       var vm = this;
 
-      Feed.init(vm.autostart)
-        .then(onActivated)
-        .catch(function () {
-          logger.warning('Camera feed failed to activate', '', 'Problem Occurred');
-          vm.feed = Feed.data;
-        });
+      activate();
 
-      function onActivated() {
-        logger.log('Viewer', 'Feed services has been activated');
-        vm.feed = Feed.data;
+      function activate() {
+        console.log('inside activate');
+        Feed.init(vm.autostart)
+          .then(onActivated)
+          .catch(function () {
+            logger.warning('Camera feed failed to activate', '', 'Problem Occurred');
+            vm.feed = Feed.data;
+          });
+
+        function onActivated() {
+          logger.log('Viewer', 'Feed services has been activated');
+          vm.feed = Feed.data;
+        }
       }
     }
 
