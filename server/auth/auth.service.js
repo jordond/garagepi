@@ -39,8 +39,8 @@ function isAuthenticated() {
   function attachUser(req, res, next) {
     User.findById(req.user._id, function (err, user) {
       var userToken;
-      if (err) return next(err);
-      if (!user) return res.sendStatus(404);
+      if (err) { return next(err); }
+      if (!user) { return res.sendStatus(404); }
 
       userToken = getToken(req.headers.authorization);
       if (user.tokens.indexOf(userToken) > -1 || !config.secureApi) {
@@ -48,7 +48,7 @@ function isAuthenticated() {
         req.user = user;
         next();
       } else {
-        return res.status(403).json({message: 'Access token is invalid or has been revoked.'})
+        return res.status(401).json({ message: 'Access token is invalid or has been revoked.' });
       }
     });
   }
@@ -133,8 +133,8 @@ function revokeToken() {
     var userId = req.body.id;
 
     User.findById(userId, function (err, user) {
-      if (err) return res.status(500).json(err);
-      if (!user) return res.sendStatus(404);
+      if (err) { return res.status(500).json(err); }
+      if (!user) { return res.sendStatus(404); }
 
       user.tokens = [];
       user.save(function (err) {
@@ -154,8 +154,8 @@ function logout() {
       userId = decoded ? decoded._id : '';
       User.findById(userId, function (err, user) {
         var index;
-        if (err) return res.status(500).json(err);
-        if (!user) return res.sendStatus(200);
+        if (err) { return res.status(500).json(err); }
+        if (!user) { return res.sendStatus(200); }
 
         index = user.tokens.indexOf(token);
         user.tokens.splice(index, 1);
@@ -280,7 +280,7 @@ function signToken(id) {
  * Set token cookie directly for oAuth strategies
  */
 function setTokenCookie(req, res) {
-  if (!req.user) return res.status(404).json({ message: 'Something went wrong, please try again.'});
+  if (!req.user) { return res.status(404).json({ message: 'Something went wrong, please try again.' }); }
   var token = signToken(req.user._id, req.user.role);
   res.cookie('token', JSON.stringify(token));
   res.redirect('/');
