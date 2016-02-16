@@ -153,22 +153,25 @@ function revokeToken() {
 function logout() {
   return compose()
     .use(function (req, res, next) {
-      var token, decoded, userId;
+      var token, decoded;
       token = getToken(req.headers.authorization);
       decoded = jwt.decode(token);
-      userId = decoded ? decoded._id : '';
-      User.findById(userId, function (err, user) {
-        var index;
-        if (err) { return res.status(500).json(err); }
-        if (!user) { return res.sendStatus(200); }
-
-        index = user.tokens.indexOf(token);
-        user.tokens.splice(index, 1);
-        user.save(function (err) {
+      if (decoded) {
+        User.findById(decoded._id, function (err, user) {
+          var index;
           if (err) { return res.status(500).json(err); }
-            return res.sendStatus(200);
+          if (!user) { return res.sendStatus(200); }
+
+          index = user.tokens.indexOf(token);
+          user.tokens.splice(index, 1);
+          user.save(function (err) {
+            if (err) { return res.status(500).json(err); }
+              return res.sendStatus(200);
+          });
         });
-      });
+      } else {
+        res.sendStatus(400);
+      }
     });
 }
 
