@@ -83,7 +83,12 @@ function isValidToken() {
       if (!user) {
         return res.sendStatus(406);
       }
-      res.sendStatus(200);
+      var userToken = getToken(req.headers.authorization);
+      if (user.tokens.indexOf(userToken) > -1) {
+        res.sendStatus(200);
+      } else {
+        res.sendStatus(401);
+      }
     });
   });
 }
