@@ -38,7 +38,10 @@ function Model(settings) {
   } else {
     handleError(this, 'Objects input, or output is undefined');
   }
-  //return this;
+
+  this.interval = setInterval(function () {
+    readInput(this);
+  }, 1000);
 }
 
 module.exports.Model = Model;
@@ -46,10 +49,7 @@ module.exports.Model = Model;
 function initInput(model) {
   var input = createPin(model.input);
   if (!input.error) {
-    readInput(input, model.input.value, true);
-    model.interval = setInterval(function () {
-      readInput(input, model.input.value);
-    }, 1000);
+    readInput(model, true);
     input.watch(function (err, value) {
       if (err) { return handleError(err, 'Watch pin ' + model.input.pin); }
       log.info(model.name + ' sensor changed, value [' + value + ']');
@@ -59,9 +59,9 @@ function initInput(model) {
   return input;
 }
 
-function readInput(input, old, force) {
-  input.read(function (err, value) {
-    var oldValue = old ? 1 : 0;
+function readInput(model, force) {
+  var oldValue = model.input.value ? 1 : 0;
+  model.input.read(function (err, value) {
     if (force || value !== oldValue) {
       if (err) { return handleError(err, 'Reading pin ' + model.input.pin); }
       log.verbose('Reading ' + model.name + ' sensor\'s initial state, value [' + value + ']');
