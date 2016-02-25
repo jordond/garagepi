@@ -38,15 +38,17 @@ function Model(settings) {
   } else {
     handleError(this, 'Objects input, or output is undefined');
   }
-
-  readInput(this, true);
-  var that = this;
-  this.interval = setInterval(function () {
-    readInput(that);
-  }, 1000);
+  setupInterval(this);
 }
 
 module.exports.Model = Model;
+
+function setupInterval(model) {
+  readInput(model, true);
+  setInterval(function () {
+    readInput(model);
+  }, 1000);
+};
 
 function initInput(model) {
   var input = createPin(model.input);
