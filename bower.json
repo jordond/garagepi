@@ -54,5 +54,9 @@
     "angular-sweetalert-as-promised": {
       "main": "./SweetAlert.min.js"
     }
+  },
+  "resolutions": {
+    "angular": "1.4.9",
+    "sweetalert": "~1.0.1"
   }
 }
