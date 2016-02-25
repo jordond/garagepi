@@ -46,11 +46,10 @@ module.exports.Model = Model;
 function initInput(model) {
   var input = createPin(model.input);
   if (!input.error) {
-    input.read(function (err, value) {
-    if (err) { return handleError(err, 'Reading pin ' + model.input.pin); }
-      log.debug('Reading ' + model.name + ' sensor\'s initial state, value [' + value + ']');
-      setSensorStatus(model, value);
-    });
+    readInput(input, model.input.value, true);
+    model.interval = setInterval(function () {
+      readInput(input, model.input.value);
+    }, 1000);
     input.watch(function (err, value) {
       if (err) { return handleError(err, 'Watch pin ' + model.input.pin); }
       log.info(model.name + ' sensor changed, value [' + value + ']');
@@ -58,6 +57,17 @@ function initInput(model) {
     });
   }
   return input;
+}
+
+function readInput(input, old, force) {
+  input.read(function (err, value) {
+    var oldValue = old ? 1 : 0;
+    if (force || value !== oldValue) {
+      if (err) { return handleError(err, 'Reading pin ' + model.input.pin); }
+      log.verbose('Reading ' + model.name + ' sensor\'s initial state, value [' + value + ']');
+      setSensorStatus(model, value);
+    }
+  });
 }
 
 function initOutput(model) {
@@ -107,6 +117,9 @@ Model.prototype.toggle = function (callback) {
 Model.prototype.close = function () {
   log.verbose('Closing pin [' + this.name + ']');
   gpio.emit('close', this);
+  if (this.interval) {
+    clearInterval(this.interval);
+  }
   unexport(this.input);
   unexport(this.output);
 };
