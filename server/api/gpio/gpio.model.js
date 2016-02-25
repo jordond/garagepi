@@ -61,7 +61,7 @@ function initInput(model) {
 
 function readInput(model, force) {
   var oldValue = model.input.value ? 1 : 0;
-  model.input.read(function (err, value) {
+  model.input.gpio.read(function (err, value) {
     if (force || value !== oldValue) {
       if (err) { return handleError(err, 'Reading pin ' + model.input.pin); }
       log.verbose('Reading ' + model.name + ' sensor\'s initial state, value [' + value + ']');
