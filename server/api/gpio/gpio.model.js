@@ -40,8 +40,9 @@ function Model(settings) {
   }
 
   readInput(this, true);
+  var that = this;
   this.interval = setInterval(function () {
-    readInput(this);
+    readInput(that);
   }, 1000);
 }
 
