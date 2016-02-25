@@ -39,6 +39,7 @@ function Model(settings) {
     handleError(this, 'Objects input, or output is undefined');
   }
 
+  readInput(this, true);
   this.interval = setInterval(function () {
     readInput(this);
   }, 1000);
@@ -49,7 +50,6 @@ module.exports.Model = Model;
 function initInput(model) {
   var input = createPin(model.input);
   if (!input.error) {
-    readInput(model, true);
     input.watch(function (err, value) {
       if (err) { return handleError(err, 'Watch pin ' + model.input.pin); }
       log.info(model.name + ' sensor changed, value [' + value + ']');
