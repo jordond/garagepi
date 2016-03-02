@@ -32,6 +32,6 @@ exports.debugMock = function (req, res) {
   Gpio.findById(req.params.id, function (gpio) {
     if (!gpio) { return res.sendStatus(404); }
     gpio.mockSensorChange();
-    return res.status(200);
+    return res.sendStatus(200);
   });
 };

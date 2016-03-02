@@ -47,7 +47,7 @@ function setupInterval(model) {
   readInput(model, true);
   setInterval(function () {
     readInput(model);
-  }, 1000);
+  }, 3000);
 };
 
 function initInput(model) {
