@@ -127,6 +127,13 @@ Model.prototype.close = function () {
   unexport(this.output);
 };
 
+Model.prototype.mockSensorChange = function (callback) {
+  log.verbose("Mocking the sensor status change");
+  this.input.value = !this.input.value;
+  gpio.emit('save', this);
+  callback();
+};
+
 /**
  * Privates
  */
