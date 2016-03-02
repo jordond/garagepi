@@ -127,11 +127,10 @@ Model.prototype.close = function () {
   unexport(this.output);
 };
 
-Model.prototype.mockSensorChange = function (callback) {
+Model.prototype.mockSensorChange = function () {
   log.verbose("Mocking the sensor status change");
   this.input.value = !this.input.value;
   gpio.emit('save', this);
-  callback();
 };
 
 /**

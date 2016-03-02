@@ -31,8 +31,7 @@ exports.toggle = function (req, res) {
 exports.debugMock = function (req, res) {
   Gpio.findById(req.params.id, function (gpio) {
     if (!gpio) { return res.sendStatus(404); }
-    gpio.mockSensorChange(function () {
-      return res.status(200);
-    });
+    gpio.mockSensorChange();
+    return res.status(200);
   });
 };
