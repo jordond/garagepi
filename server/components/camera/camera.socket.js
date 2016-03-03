@@ -55,7 +55,7 @@ function onConnection(socket) {
       camera.start();
     } else {
       log.info('[' + socket.id + '] Capture in progress, sending frame');
-      onSend('camera:frame', camera.frame());
+      socket.emit('camera:frame', camera.frame());
     }
   });
 

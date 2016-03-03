@@ -26,7 +26,7 @@ var service = {
   init       : init,
   canStream  : getCanStream,
   isStreaming: getIsStreaming,
-  frame: getFrame,
+  frame      : getFrame,
   start      : startStreaming,
   stop       : stopStreaming
 };
